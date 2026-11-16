@@ -240,11 +240,12 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 
 <script>
 (function(){
+  try{['acct','bg','v2'].forEach(function(k){var o='pocket-tama-'+k,n='pocket-tuna-'+k;if(localStorage.getItem(n)==null&&localStorage.getItem(o)!=null)localStorage.setItem(n,localStorage.getItem(o))});for(var mi=0;mi<localStorage.length;mi++){var mk=localStorage.key(mi);if(mk&&mk.indexOf('pocket-tama-v2:')===0){var mn='pocket-tuna-v2:'+mk.slice(15);if(localStorage.getItem(mn)==null)localStorage.setItem(mn,localStorage.getItem(mk))}}}catch(e){}
   var SB_URL='https://ltqbquaazmspeludhabx.supabase.co',SB_KEY='sb_publishable_plLi9gVBXrKLe-8TUZY-gw_8Dt-Nh-B';
-  var AKEY='pocket-tama-acct',ACC=null;
+  var AKEY='pocket-tuna-acct',ACC=null;
   try{ACC=JSON.parse(localStorage.getItem(AKEY)||'null')}catch(e){}
   if(!ACC||typeof ACC.user!=='string'||typeof ACC.token!=='string')ACC=null;
-  var KEY0='pocket-tama-v2',KEY=ACC?KEY0+':'+ACC.user:KEY0, MAXH=48, mem=null;
+  var KEY0='pocket-tuna-v2',KEY=ACC?KEY0+':'+ACC.user:KEY0, MAXH=48, mem=null;
   var RATE={awake:{food:8,fun:6,energy:4,clean:5},sleep:{food:3,fun:2,energy:-20,clean:2}};
   function load(){try{var s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return mem}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}mem=S;cloudSave()}
@@ -1197,7 +1198,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       shade(m)}}
   };
   var BGO=['room','garden','playground','home','bed','bath','tea','school','forest','lake','mall','cinema','sea','mountain','hospital','cafe','rice','temple','station'];
-  var BGKEY='pocket-tama-bg',BGK='garden';
+  var BGKEY='pocket-tuna-bg',BGK='garden';
   try{BGK=localStorage.getItem(BGKEY)||'garden'}catch(e){}
   if(!BGS[BGK])BGK='garden';
   function scene(m,k){var b=BGS[k||BGK]||BGS.garden;ctx.save();if(!b.hd)ctx.scale(2,2);b.f(m);ctx.restore()}
