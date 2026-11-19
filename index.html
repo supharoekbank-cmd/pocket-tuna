@@ -340,7 +340,14 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 #pn-t{font-size:15px}.coin{font-size:13px}
 .gbtn{font-size:13px}.ghud{font-size:14px}.gend{font-size:14px}.pr{font-size:11px}
 .fgrid{grid-template-columns:repeat(4,1fr)}
-#auth,#onb{justify-content:flex-start!important;gap:6px}#auth input,#onb input{flex:none;height:38px}
+#auth,#onb{justify-content:flex-start!important;gap:6px}
+.tabs{transform:translateY(105%);transition:transform .22s ease}.screen.tb .tabs{transform:none}
+.tbf{position:absolute;right:6px;bottom:6px;z-index:5;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;color:#fff;
+  background:rgba(10,12,34,.62);border:2px solid rgba(255,159,189,.75);box-shadow:0 3px 0 rgba(0,0,0,.35);transition:opacity .2s,transform .2s}
+.tbf svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.screen.tb .tbf{opacity:0;transform:scale(.6);pointer-events:none}
+.screen:not(.tb) .strip{top:auto;bottom:10px;right:52px}
+@media (prefers-reduced-motion:reduce){.tabs,.tbf{transition:none}}#auth input,#onb input{flex:none;height:38px}
 
 .top #clock{font-family:"Noto Sans Thai",sans-serif;font-weight:700;font-variant-numeric:tabular-nums}
 </style>
@@ -435,6 +442,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       </div>
       <div class="dev alring" id="ring" hidden><b id="rg-t"></b><small id="rg-s"></small><div class="rw"><button id="rg-z">เลื่อน 5 นาที</button><button class="go" id="rg-x">หยุด</button></div></div>
 
+      <button class="tbf" id="tbf" aria-label="เปิดเมนู"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></button>
       <nav class="tabs t6">
         <button data-t="home" aria-label="หน้าหลัก"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7M6 9.5V20h12V9.5"/></svg></button>
         <button data-t="care" aria-label="เลี้ยง"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
@@ -1891,7 +1899,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function nightH(m,B){if(m==='night')R('rgba(10,12,50,'+(B.indoor?.28:.34)+')',0,0,240,284);else if(m==='dusk')R(B.indoor?'rgba(255,140,80,.08)':'rgba(120,40,90,.14)',0,0,240,284);if(B.glow&&m!=='day')B.glow(m)}
   function isHD(){return !!(BGS[BGK]&&BGS[BGK].hd)}
   var petYpx=210,tyPx=null;
-  function floorBase(){return isHD()?($('screen').classList.contains('has-sheet')?((BGS[BGK]||{}).sy||206):228):210}
+  function floorBase(){return isHD()?($('screen').classList.contains('has-sheet')?Math.min((BGS[BGK]||{}).sy||206,190):228):210}
   function markBg(){Array.prototype.forEach.call(document.querySelectorAll('.bgb'),function(b){var k=b.dataset.k,own=bgOwned(k);b.classList.toggle('on',k===BGK);b.classList.toggle('lock',!own);var pe=b.querySelector('.pr');if(pe&&!b.dataset.arm)pe.textContent=own?'':'🔒 '+bgPrice(k)+' 🪙'})}
   function buildBg(){
     var gd=$('bg-grid');gd.innerHTML='';
@@ -2748,6 +2756,10 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     var v=null;try{v=sessionStorage.getItem('pt-view')}catch(e){}
     if(v!=='tuna')goHome();else{$('home').hidden=true}
     homeTick();setInterval(appsTick,250);
+    var sc=$('screen'),tbT=0;function tbOn(){sc.classList.add('tb');tbT=Date.now()}
+    $('tbf').onclick=function(){audio();tbOn()};document.querySelector('.tabs').addEventListener('pointerdown',function(){tbT=Date.now()},true);
+    setInterval(function(){if(!sc.classList.contains('tb'))return;var busy=sc.getAttribute('data-tab')||!$('ovl').hidden||!$('pnl').hidden||!$('game').hidden;
+      if(busy)tbT=Date.now();else if(Date.now()-tbT>4000)sc.classList.remove('tb')},500);
   }
   /* ===== คุยกับสัตว์เลี้ยง (Claude) ===== */
   /*AIT*/
