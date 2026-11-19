@@ -2643,12 +2643,27 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       box.appendChild(r);
       if(st.mine){var d=E('button','abtn ghost','ลบ key ทั้งหมด (กลับไปใช้ AI สำรอง)');d.onclick=function(){rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:''}).then(function(){toast('ลบ key แล้ว');aiStatus()})};box.appendChild(d)}
     }
+    var vr=E('div','arow');vr.appendChild(E('small',null,'เสียงพูด'));VOICES.forEach(function(v){var b=E('button','abtn'+(VOI.voice===v[0]?' go':''),v[1]);b.onclick=function(){VOI.voice=v[0];try{localStorage.setItem('pocket-tuna-voice',v[0])}catch(e){}renderApp();audio();sayIt('[happy] สวัสดีจ้า เสียงแบบนี้ชอบไหม')};vr.appendChild(b)});box.appendChild(vr);
     B.appendChild(box);
   }
   function vPrep(){}
   function vSTT(){return webSTT()}
-  function vTTS(t,on){webTTS(t,on)}
-  function vStopTTS(){if(window.speechSynthesis)speechSynthesis.cancel()}
+  var VOI={src:null,seq:0,voice:'Leda'};try{VOI.voice=localStorage.getItem('pocket-tuna-voice')||'Leda'}catch(e){}
+  var VOICES=[['Leda','ใส สดใส'],['Zephyr','สดชื่น'],['Puck','ร่าเริง'],['Aoede','นุ่มนวล'],['Achernar','อ่อนโยน'],['device','เสียงเครื่อง']];
+  function vTTS(text,on){
+    var my=++VOI.seq;if(!ACC||VOI.voice==='device'){webTTS(text,on);return}
+    var ac=audio();if(!ac){webTTS(text,on);return}
+    var ctl=new AbortController(),to=setTimeout(function(){ctl.abort()},14000);
+    fetch(SB_URL+'/functions/v1/pet-voice',{method:'POST',signal:ctl.signal,headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({user:ACC.user,token:ACC.token,mode:'tts',text:text,voice:VOI.voice})})
+      .then(function(r){return r.json()}).then(function(j){clearTimeout(to);if(my!==VOI.seq)return;if(!j||!j.ok||!j.audio)throw 0;
+        var bin=atob(j.audio.b64),u8=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+        return new Promise(function(res,rej){ac.decodeAudioData(u8.buffer,res,rej)}).then(function(buf){if(my!==VOI.seq)return;
+          var src=ac.createBufferSource(),an=ac.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ac.destination);
+          var d=new Uint8Array(an.fftSize);CH.vamp=function(){an.getByteTimeDomainData(d);var m=0;for(var k=0;k<d.length;k+=4){var v=Math.abs(d[k]-128)/128;if(v>m)m=v}return m};
+          src.onended=function(){if(VOI.src===src)VOI.src=null;CH.vamp=null;on.end()};VOI.src=src;on.start();src.start()})})
+      .catch(function(){clearTimeout(to);if(my===VOI.seq)webTTS(text,on)});
+  }
+  function vStopTTS(){VOI.seq++;if(VOI.src){try{VOI.src.onended=null;VOI.src.stop()}catch(e){}VOI.src=null;CH.vamp=null;CH.talk=false}if(window.speechSynthesis)speechSynthesis.cancel()}
   var AI_NOTE='AI ฟรี (Groq / Gemini)';
   /*/AIT*/
   function webSTT(){var Rc=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Rc)return null;var r=null;
@@ -2669,7 +2684,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   var VO={spk:true,lis:false,eng:null,cont:true};try{VO.spk=localStorage.getItem('pocket-tuna-spk')!=='0';VO.cont=localStorage.getItem('pocket-tuna-cont')!=='0'}catch(e){}
   function afterTalk(){if(CH.viaVoice&&VO.cont&&APP==='chat'&&!VO.lis&&!CH.busy)setTimeout(function(){if(APP==='chat'&&!VO.lis&&!CH.busy)micTap(true)},350)}
   function sayIt(t){t=speakPrep(t);if(!VO.spk||!t){afterTalk();return}
-    var tk=null;vTTS(t,{start:function(){CH.talk=true;clearInterval(tk);tk=setInterval(chDraw,110)},end:function(){CH.talk=false;clearInterval(tk);chDraw();afterTalk()}})}
+    var tk=null;vTTS(t,{start:function(){CH.talk=true;clearInterval(tk);tk=setInterval(function(){if(!CH.talk){clearInterval(tk);chDraw();return}chDraw()},110)},end:function(){CH.talk=false;clearInterval(tk);chDraw();afterTalk()}})}
   function micTap(auto){if(!auto)CH.viaVoice=true;
     if(VO.lis){if(VO.eng)VO.eng.stop();return}if(CH.busy)return;vStopTTS();ttsUnlock();
     var eng=vSTT();if(!eng){toast('เบราว์เซอร์นี้ฟังเสียงไม่ได้ ลอง Safari หรือ Chrome');return}
@@ -2711,7 +2726,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     g.clearRect(0,0,cv.width,cv.height);g.drawImage(sprite(sp,sc),0,0);
     var m={sad:'sorrow',cry:'cry',sulk:'sulk',excited:'coax',happy:'happy'}[ex];
     if(m)faceOn(g,0,0,sp,m,ex==='happy'&&(Date.now()%3200<160),0,sc);else aiFace(g,sp,ex,sc);
-    if(CH.talk&&Date.now()%240<130){var c0=SP[sp];g.fillStyle=INK;g.fillRect(15*sc,c0.my*sc,2*sc,2*sc);g.fillStyle='#e0607a';g.fillRect(15*sc,(c0.my+1)*sc,2*sc,sc)}
+    if(CH.talk&&(CH.vamp?CH.vamp()>0.035:Date.now()%240<130)){var c0=SP[sp];g.fillStyle=INK;g.fillRect(15*sc,c0.my*sc,2*sc,2*sc);g.fillStyle='#e0607a';g.fillRect(15*sc,(c0.my+1)*sc,2*sc,sc)}
     g.drawImage(outfit(sp,'',wearNow(),sc),0,0);
     if(CH.exT&&Date.now()>CH.exT&&!CH.busy){CH.exT=0;setEx('happy')}
   }
