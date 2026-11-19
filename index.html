@@ -161,7 +161,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 [hidden]{display:none!important}
 
 /* ===== หน้าหลัก + แอป: ออกแบบที่ขนาดจอจริง 240×284 px แล้วขยายด้วย --k ===== */
-.dev{position:absolute;left:0;top:0;width:240px;height:284px;transform:scale(var(--k,1));transform-origin:0 0;z-index:9;overflow:hidden;
+.dev{position:absolute;left:0;top:0;width:240px;height:284px;z-index:9;overflow:hidden;
   display:flex;flex-direction:column;font-family:"Noto Sans Thai",sans-serif;font-size:13px;line-height:1.3;color:#eef0ff;
   background:radial-gradient(130% 75% at 50% 0%,#2a2f7a 0%,#141842 55%,#0a0c22 100%)}
 .dev button{font:inherit}:where(.dev) button{color:inherit}
@@ -306,6 +306,42 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 @keyframes rg{from{transform:scale(1) rotate(-3deg)}to{transform:scale(1.08) rotate(3deg)}}
 @media (prefers-reduced-motion:reduce){.alring b,.ch-pet canvas,.ch-fx::before,.ch-fx::after,.als i,.ch-mic.on{animation:none!important}}
 .tabs.t6{grid-template-columns:repeat(6,1fr)}
+/* ===== ทั้งจอวาดที่ 240×284 px จริง แล้วขยายด้วย --k ===== */
+.scr{position:absolute;left:0;top:0;width:240px;height:284px;transform:scale(var(--k,1));transform-origin:0 0}
+.top{top:4px;left:8px;right:8px;font-size:13px}.top #nm{font-size:13px}.top #age{font-size:12px}
+.hud{top:24px;left:6px;right:6px;gap:4px}
+.st{padding:2px 4px}.st svg{width:12px;height:12px}.st .bar{height:6px}
+.hint{font-size:12px}.hint b{font-size:12px}
+.strip{left:8px;right:8px;font-size:13px}
+.tabs{height:38px;min-height:0}.tabs svg{width:21px;height:21px}
+.sheet{top:auto;bottom:38px;height:52px;padding:4px 5px}
+.cb,.mt{flex:0 0 54px;border-radius:12px}.cb svg,.mt svg{width:21px;height:21px}
+.cb span,.mt span,.pk span{font-size:11px}
+.pk{flex:0 0 58px}.pk canvas{width:30px;height:30px}
+.ovl{inset:0 0 38px 0}.ovl.full{inset:0;padding:10px 8px}
+.ovh{padding:6px 6px 0;gap:3px}
+.seg{font-size:12px;padding:0;height:32px;border-radius:10px}
+#ovx,#pnx,#g-x{width:32px;height:32px;font-size:15px;border-radius:10px}
+.ovb{font-size:13px;line-height:1.45;padding:8px 8px 12px}
+.ovb h4,.ovb label{font-size:12px}.ovb small,.row small{font-size:12px}
+.card{border-radius:12px;padding:8px}
+.chips i{font-size:12px;padding:2px 7px}
+.row{gap:8px;padding:6px 0}.row canvas{width:32px;height:32px}
+.btn{font-size:13px;min-height:36px;padding:0 12px;border-radius:11px}
+.btn.go{font-size:15px;min-height:42px;padding:0 12px}
+.btn.warn{min-height:38px}
+.onh{font-size:17px}
+.ogrid{grid-template-columns:repeat(4,1fr);gap:5px}.og{font-size:12px;padding:4px 0}.og canvas{width:40px;height:40px}
+.deadcard{bottom:42px;font-size:12px}.deadcard .btn.go{min-height:38px}
+.bgrid{grid-template-columns:repeat(2,1fr)}.bgb{font-size:12px}
+.wtop canvas{width:64px;height:64px}
+.wgrid{grid-template-columns:repeat(3,1fr)}.wb{font-size:11px}.wb canvas{width:44px;height:44px}
+.fr canvas{width:46px;height:46px}.frb b{font-size:14px}
+#pn-t{font-size:15px}.coin{font-size:13px}
+.gbtn{font-size:13px}.ghud{font-size:14px}.gend{font-size:14px}.pr{font-size:11px}
+.fgrid{grid-template-columns:repeat(4,1fr)}
+#auth,#onb{justify-content:flex-start!important;gap:6px}#auth input,#onb input{flex:none;height:38px}
+
 .top #clock{font-family:"Noto Sans Thai",sans-serif;font-weight:700;font-variant-numeric:tabular-nums}
 </style>
 
@@ -314,7 +350,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 
   <div class="shell">
     <i class="ring"></i>
-    <div class="screen" id="screen" data-tab="">
+    <div class="screen" id="screen" data-tab=""><div class="scr" id="scr">
       <canvas id="cv" width="240" height="284" aria-label="สัตว์เลี้ยงในฉาก"></canvas>
       <div class="dim"></div>
       <div class="top"><button id="clock" aria-label="สลับฉาก">--:--</button><span id="nm"></span><span id="age">เบบี๋</span></div>
@@ -407,7 +443,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
         <button data-t="info" aria-label="ข้อมูล"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8v.5"/></svg></button>
         <button data-t="menu" aria-label="เมนู"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></button>
       </nav>
-    </div>
+    </div></div>
   </div>
 
   <p class="note">แถบบนจอ: อิ่ม · สุข · พลัง · สะอาด (กะพริบเมื่อต่ำ) · แท็บล่าง: เลี้ยง · แต่งตัว · ฉาก · ข้อมูล (มีหน้าเพื่อน) · เมนู · แตะตัวสัตว์เพื่อลูบ/ง้อ/ให้โชว์ท่า · เมนู: มินิเกม ร้านค้า ภารกิจ สมุดสะสม</p>
