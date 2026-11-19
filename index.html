@@ -2629,18 +2629,19 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     if(!ACC){B.appendChild(E('div','aempty','ล็อกอินก่อนนะ แล้วคุยได้เลยฟรี'));return}
     if(!AIS.open)return;var st=AIS.st,box=E('div','ch-key');
     if(!st){box.appendChild(E('small',null,'กำลังโหลด…'));B.appendChild(box);return}
-    box.appendChild(E('small',null,!st.has?'ตอนนี้ใช้ AI ฟรีสำรอง (Pollinations) · ใส่ Gemini key ฟรีจาก aistudio.google.com → Get API key เพื่อให้ตอบเร็วและฉลาดขึ้น ใส่ครั้งเดียวทุกบัญชีได้ใช้ด้วย':
-      st.mine?'ใช้ Gemini key ของคุณอยู่ (ทุกบัญชีในเว็บนี้ใช้ร่วมกัน · key เก็บบนเซิร์ฟเวอร์ ไม่ส่งถึงเครื่องคนอื่น)':'ใช้ Gemini ที่ผู้ดูแลตั้งไว้แล้ว คุยได้เลย'));
+    var on=[st.groq?'Groq ⚡':'',st.gemini?'Gemini':''].filter(Boolean);
+    box.appendChild(E('small',null,(on.length?'ตอนนี้ใช้: '+on.join(' + ')+' (สำรอง Pollinations)':'ตอนนี้ใช้ AI ฟรีสำรอง (Pollinations) ช้าและไทยเพี้ยนบ้าง')+
+      (st.has&&!st.mine?' · ผู้ดูแลตั้ง key ไว้แล้ว':' · ใส่ key ฟรีได้ 2 แบบ: Groq (เร็วมาก console.groq.com → API Keys) หรือ Gemini (aistudio.google.com → Get API key) ใส่ทั้งสองได้ ระบบเลือกตัวที่ตอบก่อน · ทุกบัญชีใช้ร่วมกัน key อยู่บนเซิร์ฟเวอร์')));
     if(!st.has||st.mine){
-      var r=E('form','arow'),i=inp('password',st.mine?'ใส่ key ใหม่เพื่อเปลี่ยน':'วาง Gemini API key');i.autocomplete='off';var s=E('button','abtn go','บันทึก');r.appendChild(i);r.appendChild(s);
+      var r=E('form','arow'),i=inp('password','วาง key (gsk_… หรือ AQ./AIza…)');i.autocomplete='off';var s=E('button','abtn go','บันทึก');r.appendChild(i);r.appendChild(s);
       r.onsubmit=function(e){e.preventDefault();var v=i.value.trim();if(v.length<20)return toast('key สั้นไป ตรวจอีกที');s.disabled=true;
-        rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:v}).then(function(x){if(x&&x.ok){toast('บันทึก key แล้ว');AIS.open=false;aiStatus();renderApp()}else{s.disabled=false;toast(x&&x.err==='not_owner'?'มีคนตั้ง key ไว้แล้ว':'key ไม่ถูกรูปแบบ')}},function(){s.disabled=false;toast('เชื่อมต่อไม่ได้')})};
+        rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:v}).then(function(x){if(x&&x.ok){toast('บันทึก key '+(x.kind==='groq'?'Groq':'Gemini')+' แล้ว');AIS.st=null;aiStatus();renderApp()}else{s.disabled=false;toast(x&&x.err==='not_owner'?'มีคนตั้ง key ไว้แล้ว':'key ไม่ถูกรูปแบบ')}},function(){s.disabled=false;toast('เชื่อมต่อไม่ได้')})};
       box.appendChild(r);
-      if(st.mine){var d=E('button','abtn ghost','ลบ key (กลับไปใช้ AI สำรอง)');d.onclick=function(){rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:''}).then(function(){toast('ลบ key แล้ว');aiStatus()})};box.appendChild(d)}
+      if(st.mine){var d=E('button','abtn ghost','ลบ key ทั้งหมด (กลับไปใช้ AI สำรอง)');d.onclick=function(){rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:''}).then(function(){toast('ลบ key แล้ว');aiStatus()})};box.appendChild(d)}
     }
     B.appendChild(box);
   }
-  var AI_NOTE='AI ฟรี (Gemini / สำรอง Pollinations)';
+  var AI_NOTE='AI ฟรี (Groq / Gemini)';
   /*/AIT*/
   var EXN={happy:'ยิ้ม',think:'กำลังคิด',yes:'เห็นด้วย',no:'ปฏิเสธ',excited:'ตื่นเต้น',sad:'เศร้า',cry:'ร้องไห้',sulk:'งอน',shy:'เขิน'};
   var CH={log:[],busy:false,ex:'happy',exT:0,ctl:null};
