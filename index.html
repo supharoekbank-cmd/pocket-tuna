@@ -2617,25 +2617,30 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   }
   /* ===== คุยกับสัตว์เลี้ยง (Claude) ===== */
   /*AIT*/
-  var AKK='pocket-tuna-akey';
-  function aiKey(){try{return localStorage.getItem(AKK)||''}catch(e){return ''}}
+  var AIS={open:false,st:null};
   function aiAsk(sys,msgs,onText){
-    var k=aiKey();if(!k)return Promise.reject({code:'nokey'});
-    return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','content-type':'application/json'},
-      body:JSON.stringify({model:'claude-haiku-5-5',max_tokens:400,system:sys,messages:msgs})}).then(function(r){return r.json().then(function(j){
-        if(!r.ok)throw{code:r.status===401||r.status===403?'badkey':r.status===429?'rate_limited':'err'};
-        var t=(j.content||[]).map(function(c){return c.text||''}).join('');onText(t);return t})});
+    if(!ACC)return Promise.reject({code:'login'});
+    return fetch(SB_URL+'/functions/v1/pet-chat',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({user:ACC.user,token:ACC.token,sys:sys,msgs:msgs})})
+      .then(function(r){return r.json()}).then(function(j){if(!j||!j.ok)throw{code:j&&j.err==='auth'?'login':j&&j.err==='daily'?'daily':'busy'};onText(j.text);return j.text});
   }
+  function aiStatus(){if(!ACC)return;rpc('tama_ai_status',{p_user:ACC.user,p_token:ACC.token}).then(function(r){AIS.st=r&&r.ok?r:null;if(APP==='chat'&&AIS.open)renderApp()},function(){})}
+  function aiFoot(ft){if(!ACC)return;var b=E('button',null,AIS.open?'ปิดตั้งค่า':'ตั้งค่า AI');b.onclick=function(){AIS.open=!AIS.open;if(AIS.open)aiStatus();renderApp()};ft.appendChild(b)}
   function aiSetup(B){
-    var has=!!aiKey();if(has&&!CH.keyEdit)return;
-    var box=E('div','ch-key');box.appendChild(E('small',null,'บนเว็บนี้ต้องใช้ Anthropic API key (สร้างได้ที่ console.anthropic.com · คิดค่าใช้ต่อข้อความ แยกจากแพ็กเกจ claude.ai) · key เก็บในเครื่องนี้เท่านั้น ไม่ขึ้นคลาวด์'));
-    var r=E('form','arow'),i=inp('password','sk-ant-…');i.autocomplete='off';var s=E('button','abtn go','บันทึก');r.appendChild(i);r.appendChild(s);
-    r.onsubmit=function(e){e.preventDefault();var v=i.value.trim();if(!/^sk-ant-/.test(v))return toast('key ต้องขึ้นต้นด้วย sk-ant-');try{localStorage.setItem(AKK,v)}catch(e){}CH.keyEdit=false;renderApp();toast('บันทึก key แล้ว')};
-    box.appendChild(r);
-    if(has){var d=E('button','abtn ghost','ลบ key ออกจากเครื่องนี้');d.onclick=function(){try{localStorage.removeItem(AKK)}catch(e){}CH.keyEdit=false;renderApp()};box.appendChild(d)}
+    if(!ACC){B.appendChild(E('div','aempty','ล็อกอินก่อนนะ แล้วคุยได้เลยฟรี'));return}
+    if(!AIS.open)return;var st=AIS.st,box=E('div','ch-key');
+    if(!st){box.appendChild(E('small',null,'กำลังโหลด…'));B.appendChild(box);return}
+    box.appendChild(E('small',null,!st.has?'ตอนนี้ใช้ AI ฟรีสำรอง (Pollinations) · ใส่ Gemini key ฟรีจาก aistudio.google.com → Get API key เพื่อให้ตอบเร็วและฉลาดขึ้น ใส่ครั้งเดียวทุกบัญชีได้ใช้ด้วย':
+      st.mine?'ใช้ Gemini key ของคุณอยู่ (ทุกบัญชีในเว็บนี้ใช้ร่วมกัน · key เก็บบนเซิร์ฟเวอร์ ไม่ส่งถึงเครื่องคนอื่น)':'ใช้ Gemini ที่ผู้ดูแลตั้งไว้แล้ว คุยได้เลย'));
+    if(!st.has||st.mine){
+      var r=E('form','arow'),i=inp('password',st.mine?'ใส่ key ใหม่เพื่อเปลี่ยน':'AIza…');i.autocomplete='off';var s=E('button','abtn go','บันทึก');r.appendChild(i);r.appendChild(s);
+      r.onsubmit=function(e){e.preventDefault();var v=i.value.trim();if(v.length<20)return toast('key สั้นไป ตรวจอีกที');s.disabled=true;
+        rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:v}).then(function(x){if(x&&x.ok){toast('บันทึก key แล้ว');AIS.open=false;aiStatus();renderApp()}else{s.disabled=false;toast(x&&x.err==='not_owner'?'มีคนตั้ง key ไว้แล้ว':'key ไม่ถูกรูปแบบ')}},function(){s.disabled=false;toast('เชื่อมต่อไม่ได้')})};
+      box.appendChild(r);
+      if(st.mine){var d=E('button','abtn ghost','ลบ key (กลับไปใช้ AI สำรอง)');d.onclick=function(){rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:''}).then(function(){toast('ลบ key แล้ว');aiStatus()})};box.appendChild(d)}
+    }
     B.appendChild(box);
   }
-  var AI_NOTE='ใช้ API key ของคุณ';
+  var AI_NOTE='AI ฟรี (Gemini / สำรอง Pollinations)';
   /*/AIT*/
   var EXN={happy:'ยิ้ม',think:'กำลังคิด',yes:'เห็นด้วย',no:'ปฏิเสธ',excited:'ตื่นเต้น',sad:'เศร้า',cry:'ร้องไห้',sulk:'งอน',shy:'เขิน'};
   var CH={log:[],busy:false,ex:'happy',exT:0,ctl:null};
@@ -2694,7 +2699,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       CH.log.push({r:'a',t:'['+ex+'] '+body});chSave();CH.busy=false;setEx(ex,ex==='happy'?0:9000);renderApp();
     },function(e){
       CH.busy=false;var c=e&&e.code;CH.log.pop();chSave();
-      var msg=c==='off'?'ยังคุยไม่ได้ในหน้านี้':c==='not_granted'?'ยังไม่ได้อนุญาตให้ใช้ Claude':c==='rate_limited'?'คุยถี่ไปนิด พักแป๊บนึงนะ':c==='nokey'?'ยังไม่ได้ใส่ API key':c==='badkey'?'API key ไม่ถูกต้อง':'ติดต่อ Claude ไม่ได้ ลองใหม่อีกที';
+      var msg=c==='off'?'ยังคุยไม่ได้ในหน้านี้':c==='not_granted'?'ยังไม่ได้อนุญาตให้ใช้ Claude':c==='rate_limited'?'คุยถี่ไปนิด พักแป๊บนึงนะ':c==='nokey'?'ยังไม่ได้ใส่ API key':c==='badkey'?'API key ไม่ถูกต้อง':c==='login'?'ล็อกอินก่อนนะ แล้วค่อยคุยกัน':c==='daily'?'วันนี้คุยครบโควตาแล้ว พรุ่งนี้มาใหม่นะ':'ติดต่อ Claude ไม่ได้ ลองใหม่อีกที';
       setEx(c==='rate_limited'?'sulk':'sad',6000);renderApp();var b=$('ch-bub');if(b){b.className='ch-bub err';b.textContent=msg}
       var i=$('ch-in');if(i)i.value=txt;
     });
@@ -2714,6 +2719,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     var sb=E('button','abtn go',CH.busy?'…':'ส่ง');sb.disabled=CH.busy;f.appendChild(t);f.appendChild(sb);
     f.onsubmit=function(e){e.preventDefault();audio();var v=t.value;t.value='';chSend(v)};B.appendChild(f);
     var ft=E('div','ch-ft');ft.appendChild(E('small',null,AI_NOTE+' · แตะตัวสัตว์เพื่อดูสีหน้า'));
+    aiFoot(ft);
     if(CH.log.length){var cl=E('button',null,'ล้างแชท');cl.onclick=function(){if(CH.busy)return;CH.log=[];chSave();setEx('happy');renderApp()};ft.appendChild(cl)}
     B.appendChild(ft);
     setTimeout(function(){log.scrollTop=log.scrollHeight;chDraw()},0);
