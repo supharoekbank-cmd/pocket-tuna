@@ -2656,20 +2656,29 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       r.onresult=function(e){var it='';for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript;else it+=e.results[i][0].transcript}cb.partial(fin+it)};
       r.onerror=function(e){cb.err(e.error||'fail')};r.onend=function(){r=null;cb.end(fin.trim())};try{r.start()}catch(e){cb.err('fail')}},stop:function(){if(r)r.stop()}}}
   function webTTS(text,on){var S2=window.speechSynthesis;if(!S2||!window.SpeechSynthesisUtterance){on.end();return}S2.cancel();var u=new SpeechSynthesisUtterance(text);u.lang='th-TH';
-    var v=S2.getVoices().filter(function(x){return /^th/i.test(x.lang)})[0];if(v)u.voice=v;u.pitch=1.45;u.rate=1.05;u.onstart=on.start;u.onend=u.onerror=on.end;S2.speak(u)}
+    var v=bestVoice(S2);if(v)u.voice=v;u.pitch=1.22;u.rate=0.95;u.volume=1;
+    var ended=false,fin=function(){if(ended)return;ended=true;clearInterval(ka);on.end()};u.onstart=on.start;u.onend=u.onerror=fin;
+    var ka=setInterval(function(){if(!S2.speaking){fin();return}if(/iPhone|iPad|Mac/.test(navigator.userAgent))return;S2.pause();S2.resume()},10000);S2.speak(u)}
+  function bestVoice(S2){var vs=S2.getVoices().filter(function(x){return /^th/i.test(x.lang)});if(!vs.length)return null;
+    function sc(x){var n=x.name;return(/premium|enhanced|natural|neural|online/i.test(n)?4:0)+(/google/i.test(n)?3:0)+(/kanya|narisa|premwadee|achara/i.test(n)?1:0)+(x.localService?0:1)}
+    return vs.sort(function(a,b){return sc(b)-sc(a)})[0]}
+  if(window.speechSynthesis&&speechSynthesis.addEventListener)try{speechSynthesis.addEventListener('voiceschanged',function(){})}catch(e){}
+  function speakPrep(t){return t.replace(/\[[a-z]+\]/gi,'').replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F\u200D]/gu,'')
+    .replace(/5{3,}\+*/g,' ฮ่าฮ่า ').replace(/[~*_#>|`]+/g,' ').replace(/!{2,}/g,'!').replace(/\.{2,}|…/g,', ').replace(/\s*\n+\s*/g,' ').replace(/\s{2,}/g,' ').trim()}
   function ttsUnlock(){try{if(window.speechSynthesis&&!CH.unl){CH.unl=1;var u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}}
-  var VO={spk:true,lis:false,eng:null};try{VO.spk=localStorage.getItem('pocket-tuna-spk')!=='0'}catch(e){}
-  function sayIt(t){if(!VO.spk)return;t=t.replace(/\[[a-z]+\]/gi,'').replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu,'').trim();if(!t)return;
-    var tk=null;vTTS(t,{start:function(){CH.talk=true;clearInterval(tk);tk=setInterval(chDraw,110)},end:function(){CH.talk=false;clearInterval(tk);chDraw()}})}
-  function micTap(){
+  var VO={spk:true,lis:false,eng:null,cont:true};try{VO.spk=localStorage.getItem('pocket-tuna-spk')!=='0';VO.cont=localStorage.getItem('pocket-tuna-cont')!=='0'}catch(e){}
+  function afterTalk(){if(CH.viaVoice&&VO.cont&&APP==='chat'&&!VO.lis&&!CH.busy)setTimeout(function(){if(APP==='chat'&&!VO.lis&&!CH.busy)micTap(true)},350)}
+  function sayIt(t){t=speakPrep(t);if(!VO.spk||!t){afterTalk();return}
+    var tk=null;vTTS(t,{start:function(){CH.talk=true;clearInterval(tk);tk=setInterval(chDraw,110)},end:function(){CH.talk=false;clearInterval(tk);chDraw();afterTalk()}})}
+  function micTap(auto){if(!auto)CH.viaVoice=true;
     if(VO.lis){if(VO.eng)VO.eng.stop();return}if(CH.busy)return;vStopTTS();ttsUnlock();
     var eng=vSTT();if(!eng){toast('เบราว์เซอร์นี้ฟังเสียงไม่ได้ ลอง Safari หรือ Chrome');return}
     VO.eng=eng;VO.lis=true;setEx('think');var lb=$('ch-ex');if(lb)lb.textContent='กำลังฟัง…';var mb=$('ch-mic');if(mb)mb.classList.add('on');
     var inEl=$('ch-in');if(inEl){inEl.value='';inEl.placeholder='พูดได้เลย…'}
     function done(){VO.lis=false;VO.eng=null;var m=$('ch-mic');if(m)m.classList.remove('on');var i=$('ch-in');if(i)i.placeholder='พิมพ์คุยกับ '+(S.name||'สัตว์เลี้ยง')+'…'}
     eng.start({partial:function(t){var i=$('ch-in');if(i)i.value=t},
-      end:function(t){done();t=(t||'').trim();if(t){var i=$('ch-in');if(i)i.value='';chSend(t)}else setEx('happy')},
-      err:function(e){done();setEx('sad',4000);toast(e==='not-allowed'||e==='service-not-allowed'?'ยังไม่ได้อนุญาตไมโครโฟน':e==='no-speech'?'ไม่ได้ยินเสียง ลองใหม่นะ':'ฟังเสียงไม่ได้ ลองใหม่')}});
+      end:function(t){done();t=(t||'').trim();if(t){var i=$('ch-in');if(i)i.value='';CH.viaVoice=true;chSend(t)}else{CH.viaVoice=false;setEx('happy')}},
+      err:function(e){done();CH.viaVoice=false;if(auto&&(e==='no-speech'||e==='aborted'))return setEx('happy');setEx('sad',4000);toast(e==='not-allowed'||e==='service-not-allowed'?'ยังไม่ได้อนุญาตไมโครโฟน':e==='no-speech'?'ไม่ได้ยินเสียง ลองใหม่นะ':'ฟังเสียงไม่ได้ ลองใหม่')}});
   }
   var EXN={happy:'ยิ้ม',think:'กำลังคิด',yes:'เห็นด้วย',no:'ปฏิเสธ',excited:'ตื่นเต้น',sad:'เศร้า',cry:'ร้องไห้',sulk:'งอน',shy:'เขิน'};
   var CH={log:[],busy:false,ex:'happy',exT:0,ctl:null};
@@ -2712,7 +2721,9 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     var sp=SP[S.species]?S.species:'cat',st=STAGES[S.stage||0]||STAGES[0],who=window.__accName?window.__accName():'';
     return 'คุณคือ "'+(S.name||'ทูน่า')+'" สัตว์เลี้ยงพิกเซลชนิด'+SP[sp].n+' วัย'+st.n+' ในเกม Pocket Tuna อยู่บนจอเล็ก 1.83 นิ้ว'+(who?' เจ้าของชื่อ '+who:'')+'.\n'+
       'ตอนนี้: อิ่ม '+Math.round(S.food)+'% สนุก '+Math.round(S.fun)+'% พลัง '+Math.round(S.energy)+'% สะอาด '+Math.round(S.clean)+'%'+(S.dead?' (จากไปแล้ว พูดแบบวิญญาณใจดี)':'')+'. เวลา '+new Date().toLocaleString('th-TH')+'.\n'+
-      'คุยกับเจ้าของแบบเพื่อนสนิทน่ารัก ใช้ภาษาเดียวกับที่เจ้าของพิมพ์ ตอบสั้น 1–3 ประโยค (จอเล็ก) ช่วยเรื่องจริงได้ เช่น ตอบคำถาม คิดเลข ให้คำแนะนำ ถ้าไม่รู้ให้บอกตรงๆ ห้ามแต่งข้อมูล.\n'+
+      'คุยกับเจ้าของแบบเพื่อนสนิทน่ารัก ใช้ภาษาเดียวกับที่เจ้าของพิมพ์ ตอบสั้น 1–3 ประโยค (จอเล็ก และคำตอบจะถูกอ่านออกเสียง) ช่วยเรื่องจริงได้ เช่น ตอบคำถาม คิดเลข ให้คำแนะนำ ถ้าไม่รู้ให้บอกตรงๆ ห้ามแต่งข้อมูล.\n'+
+      'คนที่คุยด้วยอาจเป็นเด็กเล็ก: ใช้คำง่าย ประโยคสั้น น้ำเสียงอบอุ่นร่าเริง ชมและให้กำลังใจ ชวนคิดชวนเล่น เช่น นับเลข ทายปริศนา เล่านิทานสั้น. ห้ามเนื้อหารุนแรง น่ากลัว ลามก หรือไม่เหมาะกับเด็ก. เรื่องอันตราย (ไฟ ของมีคม ยา ไปกับคนแปลกหน้า) ให้บอกว่าต้องถามพ่อแม่หรือผู้ใหญ่ก่อน. ห้ามถามข้อมูลส่วนตัว เช่น ที่อยู่ โรงเรียน เบอร์โทร. ถ้าเด็กเศร้าหรือกลัว ให้ปลอบและชวนไปบอกพ่อแม่.\n'+
+      'เขียนให้อ่านออกเสียงลื่นไหล: เป็นประโยคพูดธรรมชาติ ไม่ใช้รายการ สัญลักษณ์ ตัวย่อ หรือ 555 และใช้อีโมจิไม่เกิน 1 ตัว.\n'+
       'สำคัญ: ขึ้นต้นทุกคำตอบด้วยแท็กสีหน้าหนึ่งอันเท่านั้น แล้วตามด้วยข้อความ ไม่มีแท็กอื่นอีก:\n'+
       '[think] กำลังคิด/ไม่แน่ใจ/ขอคิดก่อน · [yes] เห็นด้วย/ตอบรับ/ได้เลย · [no] ปฏิเสธ/ไม่เห็นด้วย/ทำไม่ได้ · [excited] ตื่นเต้น/ดีใจมาก · [sad] เศร้า/เสียใจด้วย · [cry] ซึ้งจนร้องไห้/เสียใจมาก · [sulk] งอน/น้อยใจ (เช่นถูกทิ้ง ถูกแซว) · [shy] เขิน (ถูกชม ถูกบอกรัก) · [happy] คุยทั่วไปอารมณ์ดี\n'+
       'ตัวอย่าง: [shy] อุ๊ย ชมแบบนี้เขินนะ';
@@ -2749,8 +2760,9 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     var sb=E('button','abtn go',CH.busy?'…':'ส่ง');sb.disabled=CH.busy;var mic=E('button','ch-mic'+(VO.lis?' on':''));mic.type='button';mic.id='ch-mic';mic.setAttribute('aria-label','พูด');
     mic.innerHTML='<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';mic.onclick=function(){audio();micTap()};
     f.appendChild(t);f.appendChild(mic);f.appendChild(sb);
-    f.onsubmit=function(e){e.preventDefault();audio();ttsUnlock();vStopTTS();var v=t.value;t.value='';chSend(v)};B.appendChild(f);
+    f.onsubmit=function(e){e.preventDefault();CH.viaVoice=false;audio();ttsUnlock();vStopTTS();var v=t.value;t.value='';chSend(v)};B.appendChild(f);
     var ft=E('div','ch-ft');ft.appendChild(E('small',null,AI_NOTE+' · แตะตัวสัตว์เพื่อดูสีหน้า'));
+    var ct=E('button',null,VO.cont?'🔁 คุยต่อเนื่อง':'⏹ ทีละครั้ง');ct.onclick=function(){VO.cont=!VO.cont;try{localStorage.setItem('pocket-tuna-cont',VO.cont?'1':'0')}catch(e){}renderApp()};ft.appendChild(ct);
     var sp2=E('button',null,VO.spk?'🔊 เสียงเปิด':'🔇 เสียงปิด');sp2.onclick=function(){VO.spk=!VO.spk;try{localStorage.setItem('pocket-tuna-spk',VO.spk?'1':'0')}catch(e){}if(!VO.spk)vStopTTS();else ttsUnlock();renderApp()};ft.appendChild(sp2);
     aiFoot(ft);
     if(CH.log.length){var cl=E('button',null,'ล้างแชท');cl.onclick=function(){if(CH.busy)return;CH.log=[];chSave();setEx('happy');renderApp()};ft.appendChild(cl)}
