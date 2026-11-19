@@ -252,6 +252,10 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 .ch-m.u{align-self:flex-end;background:rgba(195,155,255,.3);color:#fff}
 .ch-m.a{align-self:flex-start;background:rgba(255,255,255,.08);color:#d9dcff}
 .ch-f{flex:none;flex-wrap:nowrap}
+.ch-mic{flex:none;width:34px;height:32px;border-radius:9px;background:rgba(255,255,255,.12);display:grid;place-items:center}
+.ch-mic svg{width:17px;height:17px;fill:none;stroke:#e6e9ff;stroke-width:2;stroke-linecap:round}
+.ch-mic.on{background:#ff6b8a;animation:micp 1s ease-in-out infinite}.ch-mic.on svg{stroke:#fff}
+@keyframes micp{50%{box-shadow:0 0 0 6px rgba(255,107,138,.25)}}
 .ch-ft{flex:none;display:flex;gap:6px;align-items:center;font-size:9px;color:#8f98d6}.ch-ft small{flex:1;min-width:0}
 .ch-ft button{color:#aeb7f5;font-size:10px;text-decoration:underline}
 .ch-key{background:rgba(255,255,255,.07);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:5px;font-size:10px;color:#cfd6ff;flex:none}
@@ -2641,8 +2645,32 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     }
     B.appendChild(box);
   }
+  function vPrep(){}
+  function vSTT(){return webSTT()}
+  function vTTS(t,on){webTTS(t,on)}
+  function vStopTTS(){if(window.speechSynthesis)speechSynthesis.cancel()}
   var AI_NOTE='AI ฟรี (Groq / Gemini)';
   /*/AIT*/
+  function webSTT(){var Rc=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Rc)return null;var r=null;
+    return{start:function(cb){var fin='';try{r=new Rc()}catch(e){cb.err('fail');return}r.lang='th-TH';r.interimResults=true;r.continuous=false;
+      r.onresult=function(e){var it='';for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript;else it+=e.results[i][0].transcript}cb.partial(fin+it)};
+      r.onerror=function(e){cb.err(e.error||'fail')};r.onend=function(){r=null;cb.end(fin.trim())};try{r.start()}catch(e){cb.err('fail')}},stop:function(){if(r)r.stop()}}}
+  function webTTS(text,on){var S2=window.speechSynthesis;if(!S2||!window.SpeechSynthesisUtterance){on.end();return}S2.cancel();var u=new SpeechSynthesisUtterance(text);u.lang='th-TH';
+    var v=S2.getVoices().filter(function(x){return /^th/i.test(x.lang)})[0];if(v)u.voice=v;u.pitch=1.45;u.rate=1.05;u.onstart=on.start;u.onend=u.onerror=on.end;S2.speak(u)}
+  function ttsUnlock(){try{if(window.speechSynthesis&&!CH.unl){CH.unl=1;var u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}}
+  var VO={spk:true,lis:false,eng:null};try{VO.spk=localStorage.getItem('pocket-tuna-spk')!=='0'}catch(e){}
+  function sayIt(t){if(!VO.spk)return;t=t.replace(/\[[a-z]+\]/gi,'').replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu,'').trim();if(!t)return;
+    var tk=null;vTTS(t,{start:function(){CH.talk=true;clearInterval(tk);tk=setInterval(chDraw,110)},end:function(){CH.talk=false;clearInterval(tk);chDraw()}})}
+  function micTap(){
+    if(VO.lis){if(VO.eng)VO.eng.stop();return}if(CH.busy)return;vStopTTS();ttsUnlock();
+    var eng=vSTT();if(!eng){toast('เบราว์เซอร์นี้ฟังเสียงไม่ได้ ลอง Safari หรือ Chrome');return}
+    VO.eng=eng;VO.lis=true;setEx('think');var lb=$('ch-ex');if(lb)lb.textContent='กำลังฟัง…';var mb=$('ch-mic');if(mb)mb.classList.add('on');
+    var inEl=$('ch-in');if(inEl){inEl.value='';inEl.placeholder='พูดได้เลย…'}
+    function done(){VO.lis=false;VO.eng=null;var m=$('ch-mic');if(m)m.classList.remove('on');var i=$('ch-in');if(i)i.placeholder='พิมพ์คุยกับ '+(S.name||'สัตว์เลี้ยง')+'…'}
+    eng.start({partial:function(t){var i=$('ch-in');if(i)i.value=t},
+      end:function(t){done();t=(t||'').trim();if(t){var i=$('ch-in');if(i)i.value='';chSend(t)}else setEx('happy')},
+      err:function(e){done();setEx('sad',4000);toast(e==='not-allowed'||e==='service-not-allowed'?'ยังไม่ได้อนุญาตไมโครโฟน':e==='no-speech'?'ไม่ได้ยินเสียง ลองใหม่นะ':'ฟังเสียงไม่ได้ ลองใหม่')}});
+  }
   var EXN={happy:'ยิ้ม',think:'กำลังคิด',yes:'เห็นด้วย',no:'ปฏิเสธ',excited:'ตื่นเต้น',sad:'เศร้า',cry:'ร้องไห้',sulk:'งอน',shy:'เขิน'};
   var CH={log:[],busy:false,ex:'happy',exT:0,ctl:null};
   try{var chS=JSON.parse(localStorage.getItem('pocket-tuna-chat')||'null');if(Array.isArray(chS))CH.log=chS.filter(function(m){return m&&(m.r==='u'||m.r==='a')&&typeof m.t==='string'}).slice(-30)}catch(e){}
@@ -2674,6 +2702,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     g.clearRect(0,0,cv.width,cv.height);g.drawImage(sprite(sp,sc),0,0);
     var m={sad:'sorrow',cry:'cry',sulk:'sulk',excited:'coax',happy:'happy'}[ex];
     if(m)faceOn(g,0,0,sp,m,ex==='happy'&&(Date.now()%3200<160),0,sc);else aiFace(g,sp,ex,sc);
+    if(CH.talk&&Date.now()%240<130){var c0=SP[sp];g.fillStyle=INK;g.fillRect(15*sc,c0.my*sc,2*sc,2*sc);g.fillStyle='#e0607a';g.fillRect(15*sc,(c0.my+1)*sc,2*sc,sc)}
     g.drawImage(outfit(sp,'',wearNow(),sc),0,0);
     if(CH.exT&&Date.now()>CH.exT&&!CH.busy){CH.exT=0;setEx('happy')}
   }
@@ -2697,7 +2726,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     var bub=$('ch-bub');bub.className='ch-bub wait';bub.textContent='';
     aiAsk(chSys(),chMsgs(),function(t){var p=parseEx(t);if(p.ex&&EXN[p.ex]&&CH.ex!==p.ex)setEx(p.ex);if(p.t){bub.className='ch-bub';bub.textContent=p.t}}).then(function(t){
       var p=parseEx(t),ex=EXN[p.ex]?p.ex:'happy',body=(p.t||'…').trim();
-      CH.log.push({r:'a',t:'['+ex+'] '+body});chSave();CH.busy=false;setEx(ex,ex==='happy'?0:9000);renderApp();
+      CH.log.push({r:'a',t:'['+ex+'] '+body});chSave();CH.busy=false;setEx(ex,ex==='happy'?0:9000);renderApp();sayIt(body);
     },function(e){
       CH.busy=false;var c=e&&e.code;CH.log.pop();chSave();
       var msg=c==='off'?'ยังคุยไม่ได้ในหน้านี้':c==='not_granted'?'ยังไม่ได้อนุญาตให้ใช้ Claude':c==='rate_limited'?'คุยถี่ไปนิด พักแป๊บนึงนะ':c==='nokey'?'ยังไม่ได้ใส่ API key':c==='badkey'?'API key ไม่ถูกต้อง':c==='login'?'ล็อกอินก่อนนะ แล้วค่อยคุยกัน':c==='daily'?'วันนี้คุยครบโควตาแล้ว พรุ่งนี้มาใหม่นะ':'ติดต่อ Claude ไม่ได้ ลองใหม่อีกที';
@@ -2705,7 +2734,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       var i=$('ch-in');if(i)i.value=txt;
     });
   }
-  function appChat(B){
+  function appChat(B){vPrep();
     var hero=E('div','ch-hero'),pet=E('button','ch-pet ex-'+CH.ex);pet.id='ch-pet';pet.setAttribute('aria-label','แตะเพื่อเปลี่ยนสีหน้า');
     var cv=document.createElement('canvas');cv.width=cv.height=128;cv.id='ch-cv';pet.appendChild(cv);pet.appendChild(E('span','ch-fx'));
     var ks=Object.keys(EXN).filter(function(k){return k!=='happy'});pet.onclick=function(){if(CH.busy)return;var k=ks[(ks.indexOf(CH.ex)+1)%ks.length];setEx(k,4000)};
@@ -2717,9 +2746,12 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     var log=E('div','ch-log');log.id='ch-log';
     CH.log.forEach(function(m){if(m===last)return;log.appendChild(E('div','ch-m '+m.r,m.r==='a'?parseEx(m.t).t:m.t))});B.appendChild(log);
     var f=E('form','arow ch-f'),t=inp('text','พิมพ์คุยกับ '+(S.name||'สัตว์เลี้ยง')+'…');t.id='ch-in';t.maxLength=400;t.autocomplete='off';
-    var sb=E('button','abtn go',CH.busy?'…':'ส่ง');sb.disabled=CH.busy;f.appendChild(t);f.appendChild(sb);
-    f.onsubmit=function(e){e.preventDefault();audio();var v=t.value;t.value='';chSend(v)};B.appendChild(f);
+    var sb=E('button','abtn go',CH.busy?'…':'ส่ง');sb.disabled=CH.busy;var mic=E('button','ch-mic'+(VO.lis?' on':''));mic.type='button';mic.id='ch-mic';mic.setAttribute('aria-label','พูด');
+    mic.innerHTML='<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';mic.onclick=function(){audio();micTap()};
+    f.appendChild(t);f.appendChild(mic);f.appendChild(sb);
+    f.onsubmit=function(e){e.preventDefault();audio();ttsUnlock();vStopTTS();var v=t.value;t.value='';chSend(v)};B.appendChild(f);
     var ft=E('div','ch-ft');ft.appendChild(E('small',null,AI_NOTE+' · แตะตัวสัตว์เพื่อดูสีหน้า'));
+    var sp2=E('button',null,VO.spk?'🔊 เสียงเปิด':'🔇 เสียงปิด');sp2.onclick=function(){VO.spk=!VO.spk;try{localStorage.setItem('pocket-tuna-spk',VO.spk?'1':'0')}catch(e){}if(!VO.spk)vStopTTS();else ttsUnlock();renderApp()};ft.appendChild(sp2);
     aiFoot(ft);
     if(CH.log.length){var cl=E('button',null,'ล้างแชท');cl.onclick=function(){if(CH.busy)return;CH.log=[];chSave();setEx('happy');renderApp()};ft.appendChild(cl)}
     B.appendChild(ft);
