@@ -82,7 +82,7 @@ function wavWrap(pcm:Uint8Array,rate:number){
 async function ttsGemini(key:string,text:string,voice:string){
   const t0=Date.now();
   const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-lite-tts:generateContent',{method:'POST',signal:AbortSignal.timeout(9000),headers:{'x-goog-api-key':key,'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{parts:[{text:'Say in a cheerful, warm, cute and gentle voice for young children, at a relaxed natural pace: '+text}]}],
+    body:JSON.stringify({contents:[{parts:[{text}]}],
       generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}})});
   const j=await r.json().catch(()=>null);const p=j?.candidates?.[0]?.content?.parts?.find((x:any)=>x.inlineData)?.inlineData;
   console.log('tts gemini',r.status,Date.now()-t0+'ms',p?.mimeType||'',r.ok?'':JSON.stringify(j).slice(0,200));
