@@ -2632,7 +2632,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     box.appendChild(E('small',null,!st.has?'ตอนนี้ใช้ AI ฟรีสำรอง (Pollinations) · ใส่ Gemini key ฟรีจาก aistudio.google.com → Get API key เพื่อให้ตอบเร็วและฉลาดขึ้น ใส่ครั้งเดียวทุกบัญชีได้ใช้ด้วย':
       st.mine?'ใช้ Gemini key ของคุณอยู่ (ทุกบัญชีในเว็บนี้ใช้ร่วมกัน · key เก็บบนเซิร์ฟเวอร์ ไม่ส่งถึงเครื่องคนอื่น)':'ใช้ Gemini ที่ผู้ดูแลตั้งไว้แล้ว คุยได้เลย'));
     if(!st.has||st.mine){
-      var r=E('form','arow'),i=inp('password',st.mine?'ใส่ key ใหม่เพื่อเปลี่ยน':'AIza…');i.autocomplete='off';var s=E('button','abtn go','บันทึก');r.appendChild(i);r.appendChild(s);
+      var r=E('form','arow'),i=inp('password',st.mine?'ใส่ key ใหม่เพื่อเปลี่ยน':'วาง Gemini API key');i.autocomplete='off';var s=E('button','abtn go','บันทึก');r.appendChild(i);r.appendChild(s);
       r.onsubmit=function(e){e.preventDefault();var v=i.value.trim();if(v.length<20)return toast('key สั้นไป ตรวจอีกที');s.disabled=true;
         rpc('tama_ai_setkey',{p_user:ACC.user,p_token:ACC.token,p_key:v}).then(function(x){if(x&&x.ok){toast('บันทึก key แล้ว');AIS.open=false;aiStatus();renderApp()}else{s.disabled=false;toast(x&&x.err==='not_owner'?'มีคนตั้ง key ไว้แล้ว':'key ไม่ถูกรูปแบบ')}},function(){s.disabled=false;toast('เชื่อมต่อไม่ได้')})};
       box.appendChild(r);
