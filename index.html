@@ -343,6 +343,29 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 .gbtn{font-size:13px}.ghud{font-size:14px}.gend{font-size:14px}.pr{font-size:11px}
 .fgrid{grid-template-columns:repeat(4,1fr)}
 #auth,#onb{justify-content:flex-start!important;gap:6px}
+/* วอ */
+.happ{position:relative}.happ.dot i::after{content:"";position:absolute;top:-2px;right:8px;width:12px;height:12px;border-radius:6px;background:#ff5d7a;border:2px solid #141842}
+.wtav{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;font-style:normal;font-weight:700;color:#1b1430;font-size:15px}
+.wtn{flex:none;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#ff5d7a;color:#fff;font-size:12px;display:grid;place-items:center}
+.atag.go{background:var(--c);color:#1b1430;font-weight:700;padding:3px 10px;font-size:12px}
+.wthd{flex:none;display:flex;align-items:center;gap:8px}.wthd .ib{font-size:22px}.wthd b{font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wtl{gap:5px}
+.wtm{flex:none;display:flex;align-items:center;gap:6px;align-self:flex-start;max-width:80%;min-height:36px;padding:0 10px;border-radius:16px;background:rgba(255,255,255,.12)}
+.wtm.me{align-self:flex-end;background:rgba(124,224,195,.25)}.wtm.new{outline:2px solid #ff9fbd}.wtm.play{background:var(--c);color:#1b1430}
+.wtm i{font-style:normal;font-size:13px}.wtm span{font-size:14px}.wtm small{font-size:11px;opacity:.7}
+.wtrec{flex:none;height:56px;border-radius:28px;background:var(--c);color:#1b1430;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:15px;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.wtrec i{display:grid;place-items:center}.wtrec svg{width:24px;height:24px}
+.wtrec.on{background:#ff5d7a;color:#fff;transform:scale(1.03);box-shadow:0 0 0 calc(var(--lv,0)*12px) rgba(255,93,122,.35)}
+.wtrec.busy{opacity:.6;pointer-events:none}
+.wtcode,.wtkeys{flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:4px 8px;border-radius:10px;background:rgba(255,255,255,.07)}
+.wtcode small,.wtkeys small{font-size:12px;color:#aeb7f5}
+.wtcode b{font-size:20px;letter-spacing:.06em;color:var(--c);font-variant-numeric:tabular-nums}
+.wtkeys b{font-size:22px;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.wtpad{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.wtpad button{border-radius:10px;background:rgba(255,255,255,.1);font-size:18px;font-weight:700}
+.wtpad button.go{background:var(--c);color:#1b1430}.wtpad button:disabled{opacity:.35}
+.ap-walkie .achip{margin:0}
 .tabs{transform:translateY(105%);transition:transform .22s ease}.screen.tb .tabs{transform:none}
 .tbf{position:absolute;right:6px;bottom:6px;z-index:5;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;
   background:rgba(10,12,34,.62);border:2px solid rgba(255,159,189,.75);box-shadow:0 3px 0 rgba(0,0,0,.35);transition:opacity .2s,transform .2s}
@@ -2572,7 +2595,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     if(ringing){RQ.push([title,sub,opt]);return}
     if(opt===true)opt={snooze:5,alarm:true};opt=opt||{};
     ringing={title:title,sub:sub,opt:opt};$('rg-t').textContent=title;$('rg-s').textContent=sub||'';
-    $('rg-z').hidden=!opt.snooze;$('rg-z').textContent='อีก '+(opt.snooze||5)+' นาที';$('rg-d').hidden=!opt.done;$('ring').hidden=false;
+    $('rg-z').hidden=!opt.snooze;$('rg-z').textContent='อีก '+(opt.snooze||5)+' นาที';$('rg-d').hidden=!opt.done;$('rg-d').textContent=opt.doneLabel||'✓ ทำเสร็จแล้ว';$('ring').hidden=false;
     sysNotify(title,sub);
     clearInterval(ringT);var n=0,max=opt.soft?20:90,f=function(){if(opt.soft){beep(1047,0,.1);beep(1319,.14,.16)}else{beep(880,0,.12);beep(1175,.16,.12);beep(880,.32,.12)}if(navigator.vibrate)navigator.vibrate(opt.soft?120:200);if(++n>max)stopRing()};
     f();ringT=setInterval(f,opt.soft?3000:1000);
@@ -2602,13 +2625,14 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     if(hit)nkSave();
   }
   /* ----- หน้าหลัก (ออกแบบที่ 240×284 px จริง) ----- */
-  var APPS=[['tuna','ทูน่า','#ff9fbd'],['chat','คุยกัน','#c39bff'],['todo','งาน','#8fe0a8'],['sched','นัด','#7ec8f2'],['water','ดื่มน้ำ','#5fd3ff'],['alarm','ปลุก','#ffd166'],['timer','จับเวลา','#ff9f43']];
+  var APPS=[['tuna','ทูน่า','#ff9fbd'],['chat','คุยกัน','#c39bff'],['todo','งาน','#8fe0a8'],['sched','นัด','#7ec8f2'],['water','ดื่มน้ำ','#5fd3ff'],['alarm','ปลุก','#ffd166'],['timer','จับเวลา','#ff9f43'],['walkie','วอ','#7ce0c3']];
   var ICO={tuna:'<path d="M3 12c3-5 9-6 14-3l4-3v12l-4-3c-5 3-11 2-14-3z"/><circle cx="8" cy="11" r="1"/>',
     todo:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="m8 10 2 2 4-4M8 16h8"/>',
     sched:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/>',
     water:'<path d="M12 3c3 4.5 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-6.5 6-11z"/><path d="M9 15a3 3 0 0 0 3 3"/>',
     alarm:'<circle cx="12" cy="13" r="7"/><path d="M12 9v4l3 2M4 5l3-2M20 5l-3-2"/>',
     chat:'<path d="M4 6h16v10H10l-4 4v-4H4z"/><path d="M8 11h.5M12 11h.5M16 11h.5"/>',
+    walkie:'<rect x="7" y="7" width="10" height="15" rx="2"/><path d="M10 7V2M10 11h4M10 14h4M10 17h4"/>',
     timer:'<circle cx="12" cy="13" r="7"/><path d="M12 13V9M10 3h4M18 7l1.5-1.5"/>',
     mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     kb:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.5M11 10h.5M15 10h.5M8 14h8"/>',
@@ -2620,15 +2644,15 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function buildHome(){
     var g=$('hm-grid');g.innerHTML='';
     APPS.forEach(function(a){var b=document.createElement('button');b.className='happ';b.style.setProperty('--c',a[2]);b.innerHTML='<i>'+svgI(a[0])+'</i>';var s=document.createElement('span');s.textContent=a[1];b.appendChild(s);
-      b.onclick=function(){audio();if(a[0]==='tuna'){goTuna()}else openApp(a[0])};g.appendChild(b)});
+      b.onclick=function(){audio();if(a[0]==='tuna'){goTuna()}else openApp(a[0])};if(a[0]==='walkie'){b.id='hm-wt';}g.appendChild(b)});
   }
   function goHome(){APP=null;$('app').hidden=true;$('home').hidden=false;fitDev();homeTick()}
   function goTuna(){APP=null;$('app').hidden=true;$('home').hidden=true;try{sessionStorage.setItem('pt-view','tuna')}catch(e){}ui()}
   function shortDate(d){return d.toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'})}
   function homeTick(){
     if(!U)return;var d=new Date();$('hm-time').textContent=pad(d.getHours())+':'+pad(d.getMinutes());$('hm-date').textContent=shortDate(d);
-    var open=U.todo.filter(function(t){return !t.done}).length,w=U.water.log[dkey()]||0,al=nextAlarm(),bits=[];
-    if(open)bits.push('✓'+open);bits.push('💧'+(w/1000).toFixed(1)+'ล.');if(al)bits.push('⏰'+al);$('hm-sub').textContent=bits.join('  ');
+    var wb=$('hm-wt');if(wb)wb.classList.toggle('dot',WT.unread>0);var open=U.todo.filter(function(t){return !t.done}).length,w=U.water.log[dkey()]||0,al=nextAlarm(),bits=[];
+    if(open)bits.push('✓'+open);bits.push('💧'+(w/1000).toFixed(1)+'ล.');if(al)bits.push('⏰'+al);if(WT.unread)bits.push('📻'+WT.unread);$('hm-sub').textContent=bits.join('  ');
   }
   function nextEv(){var now=dkey()+' '+pad(new Date().getHours())+':'+pad(new Date().getMinutes());return U.ev.filter(function(e){return e.d+' '+e.tm>=now}).sort(function(a,b){return(a.d+a.tm)<(b.d+b.tm)?-1:1})[0]}
   function nextAlarm(){var on=U.alarms.filter(function(a){return a.on});if(!on.length)return '';var d=new Date(),cur=d.getHours()*60+d.getMinutes(),best=null;
@@ -2640,8 +2664,8 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function inp(type,ph,val){var e=document.createElement('input');e.type=type;if(ph)e.placeholder=ph;if(val!=null)e.value=val;return e}
   function IB(ico,cls,label,fn){var b=E('button','ib '+(cls||''));b.type='button';b.innerHTML=svgI(ico);if(label)b.setAttribute('aria-label',label);b.onclick=fn;return b}
   function renderApp(){
-    var B=$('ap-b'),top=B.scrollTop;B.innerHTML='';B.className='ap-b ap-'+APP;
-    if(APP==='todo')appTodo(B);else if(APP==='sched')appSched(B);else if(APP==='water')appWater(B);else if(APP==='alarm')appAlarm(B);else if(APP==='timer')appTimer(B);else if(APP==='chat')appChat(B);
+    if(APP==='walkie'&&REC)return;var B=$('ap-b'),top=B.scrollTop;B.innerHTML='';B.className='ap-b ap-'+APP;
+    if(APP==='todo')appTodo(B);else if(APP==='sched')appSched(B);else if(APP==='water')appWater(B);else if(APP==='alarm')appAlarm(B);else if(APP==='timer')appTimer(B);else if(APP==='chat')appChat(B);else if(APP==='walkie')appWalkie(B);
     var L=B.querySelector('.alist');if(L)L.scrollTop=top;
   }
   /* ----- พูดแทนพิมพ์ ----- */
@@ -2785,10 +2809,10 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     uLoad();buildHome();fitDev();
     $('ap-home').onclick=goHome;$('ap-home2').onclick=goTuna;
     $('rg-x').onclick=stopRing;$('rg-z').onclick=function(){var r=ringing,m=(r&&r.opt.snooze)||5;snoozeQ=r&&!r.opt.alarm?{title:r.title,sub:r.sub,opt:r.opt}:null;snoozeAt=Date.now()+m*60e3;stopRing();toast('จะเตือนอีกครั้งใน '+m+' นาที')};
-    $('rg-d').onclick=function(){var r=ringing;if(r&&r.opt.done)r.opt.done();stopRing();toast('เยี่ยม! ทำเสร็จแล้ว');beep(1175,0,.08);beep(1568,.1,.14)};
+    $('rg-d').onclick=function(){var r=ringing;stopRing();if(r&&r.opt.done)r.opt.done();if(!r||!r.opt.doneLabel){toast('เยี่ยม! ทำเสร็จแล้ว');beep(1175,0,.08);beep(1568,.1,.14)}};
     var v=null;try{v=sessionStorage.getItem('pt-view')}catch(e){}
     if(v!=='tuna')goHome();else{$('home').hidden=true}
-    homeTick();setInterval(appsTick,250);setTimeout(checkDue,1500);
+    homeTick();setInterval(appsTick,250);setTimeout(checkDue,1500);setTimeout(function(){wtPoll();wtLoad()},2500);setInterval(wtPoll,7000);
     var sc=$('screen'),tbT=0;function tbOn(){sc.classList.add('tb');tbT=Date.now()}
     $('tbf').onclick=function(){audio();tbOn()};document.querySelector('.tabs').addEventListener('pointerdown',function(){tbT=Date.now()},true);
     setInterval(function(){if(!sc.classList.contains('tb'))return;var busy=sc.getAttribute('data-tab')||!$('ovl').hidden||!$('pnl').hidden||!$('game').hidden;
@@ -2839,6 +2863,8 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       .catch(function(){clearTimeout(to);if(my===VOI.seq)webTTS(text,on)});
   }
   function vStopTTS(){VOI.seq++;if(VOI.src){try{VOI.src.onended=null;VOI.src.stop()}catch(e){}VOI.src=null;CH.vamp=null;CH.talk=false}if(window.speechSynthesis)speechSynthesis.cancel()}
+  function wtOn(){return !!ACC}
+  function wtCall(fn,a){a=a||{};if(!ACC)return Promise.reject({err:'auth'});a.p_user=ACC.user;a.p_token=ACC.token;return rpc(fn,a)}
   var AI_NOTE='AI ฟรี (Groq / Gemini)';
   /*/AIT*/
   function webSTT(){var Rc=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Rc)return null;var r=null;
@@ -2963,6 +2989,121 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     L.appendChild(E('small','anote',AI_NOTE));
     B.appendChild(L);aiSetup(L);
     var r=E('div','arow3'),bk=E('button','abtn go','เสร็จ');bk.onclick=function(){SUB=null;if(typeof AIS!=='undefined')AIS.open=false;renderApp()};r.appendChild(bk);B.appendChild(r);
+  }
+  /* ===== วอ: กดค้างพูด ส่งเสียงหาคนในรายชื่อ ===== */
+  var WT={list:null,code:'',peer:null,thread:[],lastId:0,unread:0,playing:null,queue:[],keys:''};
+  try{WT.lastId=+localStorage.getItem('pocket-tuna-wt-last')||0}catch(e){}
+  var WTC=['#ff9fbd','#8fe0a8','#7ec8f2','#ffd166','#c39bff','#ff9f43','#5fd3ff'];
+  function wtColor(u){var h=0;for(var i=0;i<u.length;i++)h=(h*31+u.charCodeAt(i))>>>0;return WTC[h%WTC.length]}
+  function wtLoad(){if(!wtOn())return Promise.resolve();return wtCall('tama_wt_contacts').then(function(r){if(r&&r.ok){WT.list=r.list||[];WT.unread=WT.list.reduce(function(s,x){return s+(+x.unread||0)},0);if(APP==='walkie'&&!WT.peer&&!SUB)renderApp();homeTick()}})}
+  function wtThread(){if(!WT.peer)return Promise.resolve();var u=WT.peer.u;return wtCall('tama_wt_thread',{p_other:u}).then(function(r){if(r&&r.ok&&WT.peer&&WT.peer.u===u){WT.thread=r.list||[];if(APP==='walkie')renderApp()}})}
+  /* ----- เล่นเสียง ----- */
+  function b64u8(b){var s=atob(b),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
+  function wtPlay(id,done){
+    var ac=audio();if(!ac){if(done)done();return}
+    if(typeof vStopTTS==='function')vStopTTS();
+    WT.playing=id;if(APP==='walkie')renderApp();
+    wtCall('tama_wt_get',{p_id:id}).then(function(r){if(!r||!r.ok)throw 0;return new Promise(function(res,rej){ac.decodeAudioData(b64u8(r.b64).buffer,res,rej)})})
+      .then(function(buf){var s=ac.createBufferSource();s.buffer=buf;s.connect(ac.destination);s.onended=function(){WT.playing=null;var m=WT.thread.filter(function(x){return x.id===id})[0];if(m)m.heard=true;if(APP==='walkie')renderApp();if(done)done()};s.start()})
+      .catch(function(){WT.playing=null;toast('เปิดเสียงไม่ได้');if(APP==='walkie')renderApp();if(done)done()});
+  }
+  function wtPlayQueue(){if(WT.playing||!WT.queue.length)return;var id=WT.queue.shift();wtPlay(id,function(){setTimeout(wtPlayQueue,300)})}
+  /* ----- อัดเสียง → WAV 16kHz mono (เล่นได้ทุกเครื่อง และ ESP32) ----- */
+  var REC=null;
+  function recStart(){
+    if(REC)return;if(!navigator.mediaDevices||!window.MediaRecorder){toast('เครื่องนี้อัดเสียงไม่ได้');return}
+    audio();if(typeof vStopTTS==='function')vStopTTS();
+    var me={cancel:false,t0:Date.now(),chunks:[]};REC=me;wtRecUI(true);
+    navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}}).then(function(st){
+      if(me.cancel||REC!==me){st.getTracks().forEach(function(t){t.stop()});return}
+      var types=['audio/webm;codecs=opus','audio/mp4','audio/webm'],mt='';for(var i=0;i<types.length;i++)if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(types[i])){mt=types[i];break}
+      var mr=new MediaRecorder(st,mt?{mimeType:mt}:undefined);me.mr=mr;me.st=st;me.t0=Date.now();mr.ondataavailable=function(e){if(e.data&&e.data.size)me.chunks.push(e.data)};mr.start(250);
+      try{var ac=audio(),src=ac.createMediaStreamSource(st),an=ac.createAnalyser();an.fftSize=256;src.connect(an);me.an=an}catch(e){}
+      beep(988,0,.06);me.tk=setInterval(function(){var el=Date.now()-me.t0,b=$('wt-rec');if(b){b.querySelector('b').textContent=(el/1000).toFixed(1)+' วิ';
+        if(me.an){var d=new Uint8Array(me.an.fftSize);me.an.getByteTimeDomainData(d);var m=0;for(var k=0;k<d.length;k+=4)m=Math.max(m,Math.abs(d[k]-128)/128);b.style.setProperty('--lv',Math.min(1,m*3).toFixed(2))}}
+        if(el>12000)recStop()},100);
+    }).catch(function(){if(REC===me)REC=null;wtRecUI(false);toast('ยังไม่ได้อนุญาตไมโครโฟน')});
+  }
+  function recStop(){
+    var me=REC;if(!me)return;REC=null;clearInterval(me.tk);wtRecUI(false);
+    if(!me.mr){me.cancel=true;toast('กดค้างไว้ แล้วพูดนะ');return}
+    var secs=(Date.now()-me.t0)/1000,to=WT.peer;
+    me.mr.onstop=function(){me.st.getTracks().forEach(function(t){t.stop()});
+      if(secs<0.7){toast('สั้นไป กดค้างไว้แล้วพูดนะ');return}
+      var blob=new Blob(me.chunks,{type:me.mr.mimeType||'audio/webm'});wtSending(true);
+      blob.arrayBuffer().then(function(ab){return new Promise(function(res,rej){audio().decodeAudioData(ab,res,rej)})}).then(function(buf){
+        var rate=16000,n=Math.max(1,Math.ceil(buf.duration*rate)),oc=new(window.OfflineAudioContext||window.webkitOfflineAudioContext)(1,n,rate),s=oc.createBufferSource();s.buffer=buf;s.connect(oc.destination);s.start();return oc.startRendering()})
+      .then(function(r){var w=wavEnc(r.getChannelData(0),16000);return wtCall('tama_wt_send',{p_to:to.u,p_mime:'audio/wav',p_audio:u8b64(w),p_secs:Math.round(r.duration*10)/10})})
+      .then(function(r){wtSending(false);if(!r||!r.ok)throw r;beep(1319,0,.06);beep(1568,.08,.08);toast('ส่งเสียงถึง '+to.name+' แล้ว');wtThread()})
+      .catch(function(e){wtSending(false);toast(e&&e.err==='not_contact'?'ยังไม่ได้เป็นรายชื่อกัน':e&&e.err==='rate'?'วันนี้ส่งครบโควตาแล้ว':'ส่งไม่สำเร็จ ลองใหม่นะ')});
+    };
+    try{me.mr.stop()}catch(e){}
+  }
+  function wavEnc(f,rate){var pk=0;for(var i=0;i<f.length;i++)pk=Math.max(pk,Math.abs(f[i]));var g=pk>0.02&&pk<0.6?0.7/pk:1;
+    var b=new ArrayBuffer(44+f.length*2),v=new DataView(b);function w(o,s){for(var i=0;i<4;i++)v.setUint8(o+i,s.charCodeAt(i))}
+    w(0,'RIFF');v.setUint32(4,36+f.length*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,f.length*2,true);
+    for(var j=0;j<f.length;j++){var x=Math.max(-1,Math.min(1,f[j]*g));v.setInt16(44+j*2,x<0?x*0x8000:x*0x7fff,true)}return new Uint8Array(b)}
+  function u8b64(u){var s='',c=0x8000;for(var i=0;i<u.length;i+=c)s+=String.fromCharCode.apply(null,u.subarray(i,i+c));return btoa(s)}
+  function wtRecUI(on){var b=$('wt-rec');if(b){b.classList.toggle('on',on);b.querySelector('b').textContent=on?'0.0 วิ':'กดค้างแล้วพูด'}}
+  function wtSending(on){var b=$('wt-rec');if(b){b.classList.toggle('busy',on);if(on)b.querySelector('b').textContent='กำลังส่ง…';else if(!REC)b.querySelector('b').textContent='กดค้างแล้วพูด'}}
+  /* ----- รับข้อความใหม่ ----- */
+  function wtPoll(){
+    if(!wtOn())return;
+    wtCall('tama_wt_inbox',{p_after:WT.lastId}).then(function(r){
+      if(!r||!r.ok||!r.list||!r.list.length)return;var fresh=r.list.filter(function(m){return !m.heard});
+      WT.lastId=r.list[r.list.length-1].id;try{localStorage.setItem('pocket-tuna-wt-last',WT.lastId)}catch(e){}
+      if(!fresh.length)return;wtLoad();
+      var here=APP==='walkie'&&WT.peer&&!$('app').hidden;
+      var mine=here?fresh.filter(function(m){return m.from===WT.peer.u}):[],other=fresh.filter(function(m){return mine.indexOf(m)<0});
+      if(mine.length){wtThread();mine.forEach(function(m){WT.queue.push(m.id)});beep(1175,0,.06);setTimeout(wtPlayQueue,350)}
+      if(other.length){var m=other[other.length-1],n=other.filter(function(x){return x.from===m.from}).length;
+        ring('📻 '+m.name,'ส่งเสียงมาหา'+(n>1?' '+n+' ข้อความ':''),{soft:true,doneLabel:'▶ ฟังเลย',done:function(){openApp('walkie');WT.peer={u:m.from,name:m.name};WT.thread=[];renderApp();
+          other.filter(function(x){return x.from===m.from}).forEach(function(x){WT.queue.push(x.id)});wtThread().then(wtPlayQueue)}})}
+    },function(){});
+  }
+  /* ----- หน้าจอ ----- */
+  function appWalkie(B){
+    if(!wtOn()){B.appendChild(E('div','aempty',typeof ACC==='undefined'?'วอใช้ได้บนเว็บ Pocket Tuna\n(ต้องล็อกอินบัญชี)':'ล็อกอินก่อนนะ\nแล้ววอหากันได้'));return}
+    if(SUB&&SUB.wtAdd){wtAddView(B);return}
+    if(WT.peer){wtTalk(B);return}
+    var L=E('div','alist');
+    if(WT.list===null){L.appendChild(E('div','aempty sm','กำลังโหลด…'));wtLoad()}
+    else if(!WT.list.length)L.appendChild(E('div','aempty','ยังไม่มีรายชื่อ\nกด + แล้วใส่รหัส 6 หลัก\nของอีกเครื่อง'));
+    (WT.list||[]).forEach(function(c){var r=E('button','arow2 wtc');r.type='button';var av=E('i','wtav',(c.name||c.u).slice(0,1).toUpperCase());av.style.background=wtColor(c.u);r.appendChild(av);
+      var t=E('span','atx',c.name||c.u);r.appendChild(t);
+      if(c.st==='a'){if(+c.unread)r.appendChild(E('b','wtn',String(c.unread)));r.onclick=function(){WT.peer={u:c.u,name:c.name};WT.thread=[];renderApp();wtThread()}}
+      else if(c.st==='b'){r.appendChild(E('small','atag','รออีกฝั่งรับ'));r.onclick=function(){toast('ให้ '+(c.name||c.u)+' ใส่รหัสของเราหรือกดรับ')}}
+      else{var ok=E('small','atag go','รับ');r.appendChild(ok);r.onclick=function(){wtCall('tama_wt_accept',{p_other:c.u}).then(function(x){if(x&&x.ok){toast('เพิ่ม '+(c.name||c.u)+' แล้ว');wtLoad()}})}}
+      L.appendChild(r)});
+    B.appendChild(L);
+    var bar=E('div','abar'),add=E('button','amic');add.type='button';add.innerHTML=svgI('plus');add.appendChild(E('span',null,'เพิ่มรายชื่อ'));add.onclick=function(){SUB={wtAdd:true};WT.keys='';renderApp();
+      if(!WT.code)wtCall('tama_wt_code').then(function(r){if(r&&r.ok){WT.code=r.code;if(SUB&&SUB.wtAdd)renderApp()}})};
+    bar.appendChild(add);B.appendChild(bar);
+  }
+  function wtAddView(B){
+    var top=E('div','wtcode');top.appendChild(E('small',null,'รหัสเครื่องนี้'));top.appendChild(E('b',null,WT.code?WT.code.replace(/(\d{3})(\d{3})/,'$1 $2'):'…'));B.appendChild(top);
+    var show=E('div','wtkeys');show.appendChild(E('small',null,'ใส่รหัสอีกเครื่อง'));var dg=E('b',null,(WT.keys+'______').slice(0,6).replace(/(.{3})(.{3})/,'$1 $2'));show.appendChild(dg);B.appendChild(show);
+    var kp=E('div','wtpad');['1','2','3','4','5','6','7','8','9','⌫','0','✓'].forEach(function(k){var b=E('button',k==='✓'?'go':'',k);b.type='button';
+      if(k==='✓'&&WT.keys.length<6)b.disabled=true;
+      b.onclick=function(){if(k==='⌫')WT.keys=WT.keys.slice(0,-1);else if(k==='✓'){wtCall('tama_wt_add',{p_code:WT.keys}).then(function(r){
+          if(r&&r.ok){toast(r.mutual?'เพิ่ม '+r.name+' แล้ว คุยกันได้เลย':'ส่งคำขอถึง '+r.name+' แล้ว รออีกฝั่งกดรับ');SUB=null;WT.list=null;renderApp()}
+          else toast(r&&r.err==='not_found'?'ไม่พบรหัสนี้':r&&r.err==='self'?'นี่รหัสของเครื่องนี้เอง':r&&r.err==='rate'?'ลองหลายครั้งไป พรุ่งนี้ลองใหม่':'เพิ่มไม่สำเร็จ')});return}
+        else if(WT.keys.length<6)WT.keys+=k;renderApp()};kp.appendChild(b)});
+    B.appendChild(kp);
+    var bk=E('button','achip','กลับ');bk.onclick=function(){SUB=null;renderApp()};B.appendChild(bk);
+  }
+  function wtTalk(B){
+    var hd=E('div','wthd');hd.appendChild(IB('minus','','กลับ',function(){WT.peer=null;WT.queue=[];renderApp();wtLoad()}));hd.lastChild.innerHTML='‹';
+    var av=E('i','wtav',(WT.peer.name||WT.peer.u).slice(0,1).toUpperCase());av.style.background=wtColor(WT.peer.u);hd.appendChild(av);hd.appendChild(E('b',null,WT.peer.name||WT.peer.u));B.appendChild(hd);
+    var L=E('div','alist wtl');if(!WT.thread.length)L.appendChild(E('div','aempty sm','ยังไม่มีข้อความ\nกดปุ่มค้างไว้แล้วพูดได้เลย'));
+    WT.thread.forEach(function(m){var b=E('button','wtm'+(m.me?' me':'')+(!m.me&&!m.heard?' new':'')+(WT.playing===m.id?' play':''));b.type='button';
+      b.appendChild(E('i',null,WT.playing===m.id?'■':'▶'));b.appendChild(E('span',null,(Math.round(m.secs*10)/10||'?')+' วิ'));
+      var t=new Date(m.at);b.appendChild(E('small',null,pad(t.getHours())+':'+pad(t.getMinutes())));b.onclick=function(){if(!WT.playing)wtPlay(m.id)};L.appendChild(b)});
+    B.appendChild(L);setTimeout(function(){L.scrollTop=L.scrollHeight},0);
+    var rec=E('button','wtrec'+(REC?' on':''));rec.type='button';rec.id='wt-rec';rec.innerHTML='<i>'+svgI('mic')+'</i>';rec.appendChild(E('b',null,REC?'…':'กดค้างแล้วพูด'));
+    rec.addEventListener('pointerdown',function(e){e.preventDefault();try{rec.setPointerCapture(e.pointerId)}catch(x){}recStart()});
+    rec.addEventListener('pointerup',function(){recStop()});rec.addEventListener('pointercancel',function(){recStop()});
+    rec.addEventListener('contextmenu',function(e){e.preventDefault()});B.appendChild(rec);
   }
 
   buildOnb();buildBg();initEcon();if(!S.name)showOnb();initApps();

@@ -61,3 +61,23 @@ Returns `{ok, audio:{mime,b64}, src}`.
 4. Keep the last few turns in RAM and send them as `msgs`.
 
 Keys (Groq / Gemini) live on the server and are set from the web app under "ตั้งค่า AI". The device never holds them.
+
+# Walkie-talkie (วอ) API
+
+Plain Supabase RPCs: `POST https://ltqbquaazmspeludhabx.supabase.co/rest/v1/rpc/<name>` with header `apikey: <publishable key>` and JSON body. Every call includes `p_user` and `p_token`.
+
+Only mutual contacts can talk: A enters B's 6-digit code (`tama_wt_add`), then B accepts (`tama_wt_accept`) or enters A's code.
+
+| RPC | Extra args | Returns |
+|---|---|---|
+| `tama_wt_code` | – | `{ok, code}` this device's 6-digit code |
+| `tama_wt_add` | `p_code` | `{ok, u, name, mutual}` / `err: not_found, self, rate` |
+| `tama_wt_accept` | `p_other` | `{ok}` |
+| `tama_wt_remove` | `p_other` | `{ok}` |
+| `tama_wt_contacts` | – | `{ok, list:[{u, name, st, unread}]}`; st `a` = can talk, `b` = waiting for them, `c` = they asked you |
+| `tama_wt_send` | `p_to, p_mime:"audio/wav", p_audio:<base64>, p_secs` | `{ok, id}` |
+| `tama_wt_inbox` | `p_after` (last seen id) | `{ok, list:[{id, from, name, secs, heard, at}]}` |
+| `tama_wt_thread` | `p_other` | last 12 messages both ways |
+| `tama_wt_get` | `p_id` | `{ok, mime, b64, secs}` and marks it heard |
+
+Audio: WAV, 16 kHz, mono, 16-bit, max ~12 s (base64 ≤ 900 KB). Poll `tama_wt_inbox` every few seconds; play new clips automatically. Messages are kept 7 days; 200 sends per account per day.
