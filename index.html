@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0a0c22">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pocket Tuna">
+<title>Pocket Tuna</title>
 <style>html{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}</style>
 </head>
 <body>
@@ -350,6 +358,8 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 #sh-care .ci.lock i{filter:grayscale(1);opacity:.45}#sh-care .ci.lock span{color:#ffd166}
 #sh-care .ci.arm{outline:2px solid #ffd166}
 #sh-care .cbk{flex:0 0 38px}#sh-care .cbk b{font-size:22px;line-height:1}#sh-care .cbk span{color:#ffd166}
+.hm-push{margin:auto auto 0;padding:6px 14px;border-radius:14px;background:rgba(255,209,102,.18);color:#ffd166;font-size:13px}
+.pushl{flex:none;font-size:14px;line-height:1.4;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.07)}.pushl.ok{color:#8fe0a8}.pushl.step{background:none;padding:2px 4px;font-size:13px;color:#cfd6ff}
 /* โทรสด */
 .callv{z-index:21;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;background:radial-gradient(120% 80% at 50% 20%,#1f6b5c 0%,#123a40 55%,#0a1a22 100%)}
 .callv .cl-t{font-size:12px;color:#9fe3d0}
@@ -477,6 +487,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       <div class="dev home" id="home" hidden>
         <div class="hm-clock"><b id="hm-time">--:--</b><small id="hm-date"></small><em id="hm-sub"></em></div>
         <div class="hm-grid" id="hm-grid"></div>
+        <button class="hm-push" id="hm-push" hidden></button>
       </div>
       <div class="dev app" id="app" hidden>
         <header><button id="ap-home" aria-label="หน้าหลัก"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7M6 9.5V20h12V9.5"/></svg></button><b id="ap-t"></b><span id="ap-clk"></span><button id="ap-home2" aria-label="ไป Pocket Tuna"><svg viewBox="0 0 24 24"><path d="M3 12c3-5 9-6 14-3l4-3v12l-4-3c-5 3-11 2-14-3z"/></svg></button></header>
@@ -2697,20 +2708,20 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function homeTick(){
     if(!U)return;var d=new Date();$('hm-time').textContent=pad(d.getHours())+':'+pad(d.getMinutes());$('hm-date').textContent=shortDate(d);
     var wb=$('hm-wt');if(wb)wb.classList.toggle('dot',WT.unread>0);var open=U.todo.filter(function(t){return !t.done}).length,w=U.water.log[dkey()]||0,al=nextAlarm(),bits=[];
-    if(open)bits.push('✓'+open);bits.push('💧'+(w/1000).toFixed(1)+'ล.');if(al)bits.push('⏰'+al);if(WT.unread)bits.push('📻'+WT.unread);$('hm-sub').textContent=bits.join('  ');
+    if(open)bits.push('✓'+open);bits.push('💧'+(w/1000).toFixed(1)+'ล.');if(al)bits.push('⏰'+al);if(WT.unread)bits.push('📻'+WT.unread);$('hm-sub').textContent=bits.join('  ');var pc=pushChip(),hp=$('hm-push');if(hp){hp.hidden=!pc;hp.textContent=pc}
   }
   function nextEv(){var now=dkey()+' '+pad(new Date().getHours())+':'+pad(new Date().getMinutes());return U.ev.filter(function(e){return e.d+' '+e.tm>=now}).sort(function(a,b){return(a.d+a.tm)<(b.d+b.tm)?-1:1})[0]}
   function nextAlarm(){var on=U.alarms.filter(function(a){return a.on});if(!on.length)return '';var d=new Date(),cur=d.getHours()*60+d.getMinutes(),best=null;
     on.forEach(function(a){var p=a.tm.split(':'),m=+p[0]*60+ +p[1],diff=(m-cur+1440)%1440;if(best===null||diff<best.diff)best={diff:diff,tm:a.tm}});return best.tm}
   /* ----- หน้าแอป ----- */
   var SUB=null;
-  function openApp(k){APP=k;SUB=null;KB=false;$('home').hidden=true;$('app').hidden=false;fitDev();var a=APPS.filter(function(x){return x[0]===k})[0];$('ap-t').textContent=a[1];$('app').style.setProperty('--c',a[2]);if(typeof vPrep==='function')vPrep();renderApp()}
+  function openApp(k){APP=k;SUB=null;KB=false;$('home').hidden=true;$('app').hidden=false;fitDev();var a=APPS.filter(function(x){return x[0]===k})[0]||['push','แจ้งเตือน','#ffd166'];$('ap-t').textContent=a[1];$('app').style.setProperty('--c',a[2]);if(typeof vPrep==='function')vPrep();renderApp()}
   function E(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
   function inp(type,ph,val){var e=document.createElement('input');e.type=type;if(ph)e.placeholder=ph;if(val!=null)e.value=val;return e}
   function IB(ico,cls,label,fn){var b=E('button','ib '+(cls||''));b.type='button';b.innerHTML=svgI(ico);if(label)b.setAttribute('aria-label',label);b.onclick=fn;return b}
   function renderApp(){
     if(APP==='walkie'&&REC)return;var B=$('ap-b'),top=B.scrollTop;B.innerHTML='';B.className='ap-b ap-'+APP;
-    if(APP==='todo')appTodo(B);else if(APP==='sched')appSched(B);else if(APP==='water')appWater(B);else if(APP==='alarm')appAlarm(B);else if(APP==='timer')appTimer(B);else if(APP==='chat')appChat(B);else if(APP==='walkie')appWalkie(B);
+    if(APP==='todo')appTodo(B);else if(APP==='sched')appSched(B);else if(APP==='water')appWater(B);else if(APP==='alarm')appAlarm(B);else if(APP==='timer')appTimer(B);else if(APP==='chat')appChat(B);else if(APP==='walkie')appWalkie(B);else if(APP==='push')appPush(B);
     var L=B.querySelector('.alist');if(L)L.scrollTop=top;
   }
   /* ----- พูดแทนพิมพ์ ----- */
@@ -2857,7 +2868,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     $('rg-d').onclick=function(){var r=ringing;stopRing();if(r&&r.opt.done)r.opt.done();if(!r||!r.opt.doneLabel){toast('เยี่ยม! ทำเสร็จแล้ว');beep(1175,0,.08);beep(1568,.1,.14)}};
     var v=null;try{v=sessionStorage.getItem('pt-view')}catch(e){}
     if(v!=='tuna')goHome();else{$('home').hidden=true}
-    homeTick();setInterval(appsTick,250);setTimeout(checkDue,1500);setTimeout(function(){wtPoll();wtLoad()},2500);setInterval(wtPoll,7000);initCare();setInterval(careTick,1000);initCall();
+    homeTick();setInterval(appsTick,250);setTimeout(checkDue,1500);setTimeout(function(){wtPoll();wtLoad()},2500);setInterval(wtPoll,7000);initCare();setInterval(careTick,1000);initCall();pushInit();$('hm-push').onclick=function(){openApp('push')};
     var sc=$('screen'),tbT=0;function tbOn(){sc.classList.add('tb');tbT=Date.now()}
     $('tbf').onclick=function(){audio();tbOn()};document.querySelector('.tabs').addEventListener('pointerdown',function(){tbT=Date.now()},true);
     setInterval(function(){if(!sc.classList.contains('tb'))return;var busy=sc.getAttribute('data-tab')||!$('ovl').hidden||!$('pnl').hidden||!$('game').hidden;
@@ -2910,6 +2921,51 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function vStopTTS(){VOI.seq++;if(VOI.src){try{VOI.src.onended=null;VOI.src.stop()}catch(e){}VOI.src=null;CH.vamp=null;CH.talk=false}if(window.speechSynthesis)speechSynthesis.cancel()}
   function wtOn(){return !!ACC}
   function wtCall(fn,a){a=a||{};if(!ACC)return Promise.reject({err:'auth'});a.p_user=ACC.user;a.p_token=ACC.token;return rpc(fn,a)}
+  /* ----- web push (แจ้งเตือนตอนไม่ได้เปิดเว็บ) ----- */
+  var PUSH={reg:null,on:false,busy:false};
+  function pushSupported(){return 'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window}
+  function isIOS(){return /iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+  function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true}
+  function b64urlU8(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var r=atob(s),u=new Uint8Array(r.length);for(var i=0;i<r.length;i++)u[i]=r.charCodeAt(i);return u}
+  function u8b64url(buf){var u=new Uint8Array(buf),s='';for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+  function pushInit(){
+    if(!pushSupported())return;
+    navigator.serviceWorker.register('sw.js').then(function(reg){PUSH.reg=reg;return reg.pushManager.getSubscription()}).then(function(sub){PUSH.on=!!sub&&Notification.permission==='granted';if(PUSH.on&&ACC)pushSave(sub);homeTick()}).catch(function(){});
+    navigator.serviceWorker.addEventListener('message',function(e){var d=e.data||{};if(d.open)pushOpen(d.open);if(d.push&&d.push.kind==='wt')wtPoll();if(d.push&&d.push.kind==='call')callPoll()});
+    if(location.hash)setTimeout(function(){pushOpen(location.hash)},1200);
+  }
+  function pushOpen(h){var m={'#wt':'walkie','#todo':'todo','#sched':'sched','#alarm':'alarm'}[h];try{history.replaceState(null,'',location.pathname)}catch(e){}if(m)openApp(m);if(h==='#call')callPoll();if(h==='#wt')wtPoll()}
+  function pushSave(sub){var j=sub.toJSON();return wtCall('tama_push_sub',{p_endpoint:sub.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth})}
+  function pushEnable(){
+    if(PUSH.busy||!PUSH.reg||!ACC)return;PUSH.busy=true;
+    Notification.requestPermission().then(function(p){if(p!=='granted')throw{msg:'ยังไม่ได้อนุญาตแจ้งเตือน เปิดได้ในตั้งค่าของเบราว์เซอร์'};return rpc('tama_push_key',{})})
+      .then(function(k){return PUSH.reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64urlU8(String(k))})})
+      .then(function(sub){return pushSave(sub)}).then(function(r){if(!r||!r.ok)throw{};PUSH.on=true;PUSH.busy=false;toast('เปิดแจ้งเตือนแล้ว');pushTest();if(APP==='push')renderApp();homeTick()})
+      .catch(function(e){PUSH.busy=false;toast(e&&e.msg||'เปิดแจ้งเตือนไม่สำเร็จ');if(APP==='push')renderApp()});
+  }
+  function pushDisable(){if(!PUSH.reg)return;PUSH.reg.pushManager.getSubscription().then(function(s){if(!s)return;wtCall('tama_push_unsub',{p_endpoint:s.endpoint});return s.unsubscribe()}).then(function(){PUSH.on=false;toast('ปิดแจ้งเตือนแล้ว');if(APP==='push')renderApp();homeTick()})}
+  function pushCall(body){if(!ACC)return Promise.resolve(null);body.user=ACC.user;body.token=ACC.token;
+    return fetch(SB_URL+'/functions/v1/pet-push',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}).catch(function(){return null})}
+  function pushTest(){pushCall({kind:'test'})}
+  function pushPing(kind,to){pushCall({kind:kind,to:to})}
+  function pushChip(){return ACC&&pushSupported()?(PUSH.on?'':'🔔 เปิดแจ้งเตือน'):(ACC&&isIOS()&&!isStandalone()?'🔔 เปิดแจ้งเตือน':'')}
+  function appPush(B){
+    var L=E('div','alist set');
+    function line(t,c){L.appendChild(E('div','pushl'+(c?' '+c:''),t))}
+    if(!ACC){line('ล็อกอินก่อน แล้วค่อยเปิดแจ้งเตือน');B.appendChild(L);return}
+    if(isIOS()&&!isStandalone()){
+      line('iPhone ต้องติดตั้งแอปลงหน้าจอโฮมก่อน ถึงจะแจ้งเตือนได้');
+      ['1. กดปุ่มแชร์ ⬆️ ใน Safari','2. เลือก "เพิ่มไปยังหน้าจอโฮม"','3. เปิด Pocket Tuna จากไอคอนบนหน้าจอโฮม','4. เข้ามาหน้านี้แล้วกด "เปิดแจ้งเตือน"'].forEach(function(s){line(s,'step')});
+      B.appendChild(L);return}
+    if(!pushSupported()){line('เบราว์เซอร์นี้แจ้งเตือนไม่ได้ ลอง Chrome หรือ Safari รุ่นใหม่');B.appendChild(L);return}
+    line(PUSH.on?'✅ เปิดแจ้งเตือนอยู่ในเครื่องนี้':'🔕 ยังไม่ได้เปิดแจ้งเตือน',PUSH.on?'ok':'');
+    line('แจ้งเตือนแม้ไม่ได้เปิดเว็บ: เสียงวอ · สายเข้า · นาฬิกาปลุก · นัด (ก่อน 10 นาที และตรงเวลา) · งานที่ถึงเวลา','step');
+    B.appendChild(L);
+    var r=E('div','arow3');
+    if(PUSH.on){var t=E('button','abtn','ทดสอบ');t.onclick=function(){pushTest();toast('ส่งแจ้งเตือนทดสอบแล้ว')};var d=E('button','abtn','ปิด');d.onclick=pushDisable;r.appendChild(d);r.appendChild(t)}
+    else{var on=E('button','abtn go big',PUSH.busy?'กำลังเปิด…':'เปิดแจ้งเตือน');on.onclick=function(){audio();pushEnable()};r.appendChild(on)}
+    B.appendChild(r);
+  }
   var AI_NOTE='AI ฟรี (Groq / Gemini)';
   /*/AIT*/
   function webSTT(){var Rc=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Rc)return null;var r=null;
@@ -3079,7 +3135,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
       blob.arrayBuffer().then(function(ab){return new Promise(function(res,rej){audio().decodeAudioData(ab,res,rej)})}).then(function(buf){
         var rate=16000,n=Math.max(1,Math.ceil(buf.duration*rate)),oc=new(window.OfflineAudioContext||window.webkitOfflineAudioContext)(1,n,rate),s=oc.createBufferSource();s.buffer=buf;s.connect(oc.destination);s.start();return oc.startRendering()})
       .then(function(r){var w=wavEnc(r.getChannelData(0),16000);return wtCall('tama_wt_send',{p_to:to.u,p_mime:'audio/wav',p_audio:u8b64(w),p_secs:Math.round(r.duration*10)/10})})
-      .then(function(r){wtSending(false);if(!r||!r.ok)throw r;beep(1319,0,.06);beep(1568,.08,.08);toast('ส่งเสียงถึง '+to.name+' แล้ว');wtThread()})
+      .then(function(r){wtSending(false);if(!r||!r.ok)throw r;beep(1319,0,.06);beep(1568,.08,.08);toast('ส่งเสียงถึง '+to.name+' แล้ว');wtThread();pushPing('wt',to.u)})
       .catch(function(e){wtSending(false);toast(e&&e.err==='not_contact'?'ยังไม่ได้เป็นรายชื่อกัน':e&&e.err==='rate'?'วันนี้ส่งครบโควตาแล้ว':'ส่งไม่สำเร็จ ลองใหม่นะ')});
     };
     try{me.mr.stop()}catch(e){}
@@ -3267,7 +3323,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     CALL.peer={u:peer.u,name:peer.name};CALL.id=uid()+uid();CALL.st='out';CALL.why='';CALL.muted=false;callUI();ringLoop(true,false);
     getMic().then(function(ms){if(CALL.st!=='out')return ms.getTracks().forEach(function(t){t.stop()});CALL.ms=ms;var pc=mkPC();
       return pc.createOffer().then(function(o){return pc.setLocalDescription(o)}).then(function(){return iceDone(pc)}).then(function(){if(CALL.st!=='out')return;
-        return sig('offer',pc.localDescription.sdp).then(function(r){if(!r||!r.ok)throw r;CALL.timer=setTimeout(function(){if(CALL.st==='out'){sig('end');callEnd('ไม่มีคนรับสาย')}},40000)})})})
+        return sig('offer',pc.localDescription.sdp).then(function(r){if(!r||!r.ok)throw r;pushPing('call',CALL.peer.u);CALL.timer=setTimeout(function(){if(CALL.st==='out'){sig('end');callEnd('ไม่มีคนรับสาย')}},40000)})})})
     .catch(function(e){callEnd(e&&e.err==='not_contact'?'ยังไม่ได้เป็นรายชื่อกัน':e&&e.name==='NotAllowedError'?'ยังไม่ได้อนุญาตไมโครโฟน':'โทรไม่สำเร็จ')});
   }
   function callAccept(){
@@ -3288,7 +3344,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function callPoll(){
     if(!wtOn())return;
     wtCall('tama_call_poll',{p_after:CALL.after}).then(function(r){
-      if(!r||!r.ok)return;if(CALL.after<0){CALL.after=r.max||0;return}
+      if(!r||!r.ok)return;if(CALL.after<0){CALL.after=r.max||0;r.list=(r.list||[]).filter(function(m){return m.kind==='offer'&&m.age<30&&!(r.list||[]).some(function(n){return n.call===m.call&&n.kind==='end'})})}
       (r.list||[]).forEach(function(m){CALL.after=Math.max(CALL.after,m.id);
         if(m.kind==='offer'){if(m.age>35)return;
           if(CALL.st!=='idle'&&CALL.st!=='end'){wtCall('tama_call_send',{p_to:m.from,p_call:m.call,p_kind:'busy',p_sdp:null});return}
