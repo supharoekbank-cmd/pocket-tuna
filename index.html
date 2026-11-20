@@ -350,6 +350,17 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
 #sh-care .ci.lock i{filter:grayscale(1);opacity:.45}#sh-care .ci.lock span{color:#ffd166}
 #sh-care .ci.arm{outline:2px solid #ffd166}
 #sh-care .cbk{flex:0 0 38px}#sh-care .cbk b{font-size:22px;line-height:1}#sh-care .cbk span{color:#ffd166}
+/* โทรสด */
+.callv{z-index:21;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;background:radial-gradient(120% 80% at 50% 20%,#1f6b5c 0%,#123a40 55%,#0a1a22 100%)}
+.callv .cl-t{font-size:12px;color:#9fe3d0}
+.callv #cl-av{display:grid;place-items:center;width:76px;height:76px;border-radius:50%;font-style:normal;font-weight:700;font-size:34px;color:#1b1430;box-shadow:0 0 0 6px rgba(124,224,195,.18)}
+.callv:not(.live) #cl-av{animation:micp 1.2s ease-in-out infinite}
+.callv #cl-n{font-size:20px}.callv #cl-s{min-height:20px;font-size:15px;color:#cfeee6;font-variant-numeric:tabular-nums}
+.callv.live #cl-s{font-size:22px;font-weight:700;color:#fff}
+.cl-row{display:flex;gap:14px;margin-top:8px}
+.cl-row button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:#fff}
+.cl-row svg{width:58px;height:58px;padding:15px;border-radius:50%;box-sizing:border-box;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.cl-ok svg{background:#2fbf71}.cl-no svg{background:#ff4d5e}.cl-mu svg{background:rgba(255,255,255,.18)}.cl-mu.on svg{background:#fff;stroke:#123a40}
 /* วอ */
 .happ{position:relative}.happ.dot i::after{content:"";position:absolute;top:-2px;right:8px;width:12px;height:12px;border-radius:6px;background:#ff5d7a;border:2px solid #141842}
 .wtav{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;font-style:normal;font-weight:700;color:#1b1430;font-size:15px}
@@ -472,6 +483,10 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
         <div class="ap-b" id="ap-b"></div>
         <div class="als" id="ap-ls" hidden><b id="ls-t"></b><i><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></i><p id="ls-x"></p><button id="ls-stop">พูดเสร็จแล้ว</button></div>
       </div>
+      <div class="dev callv" id="call" hidden><small class="cl-t">📞 โทรด้วยเสียง</small><i id="cl-av"></i><b id="cl-n"></b><span id="cl-s"></span>
+        <div class="cl-row" id="cl-in"><button class="cl-no" id="cl-no"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>ไม่รับ</span></button><button class="cl-ok" id="cl-ok"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>รับสาย</span></button></div>
+        <div class="cl-row" id="cl-live"><button class="cl-mu" id="cl-mute"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>ปิดไมค์</span></button><button class="cl-no" id="cl-end"><svg viewBox="0 0 24 24"><path d="M3 15c5-5 13-5 18 0l-3 3-3-2v-3a12 12 0 0 0-6 0v3l-3 2z"/></svg><span>วางสาย</span></button></div>
+        <audio id="call-au" autoplay playsinline></audio></div>
       <div class="dev alring" id="ring" hidden><b id="rg-t"></b><small id="rg-s"></small><div class="rw"><button id="rg-z">เลื่อน 5 นาที</button><button class="go" id="rg-x">ปิด</button></div><button class="go2" id="rg-d" hidden>✓ ทำเสร็จแล้ว</button></div>
 
       <button class="tbf" id="tbf" aria-label="เปิดเมนู"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></button>
@@ -2663,6 +2678,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     chat:'<path d="M4 6h16v10H10l-4 4v-4H4z"/><path d="M8 11h.5M12 11h.5M16 11h.5"/>',
     walkie:'<rect x="7" y="7" width="10" height="15" rx="2"/><path d="M10 7V2M10 11h4M10 14h4M10 17h4"/>',
     timer:'<circle cx="12" cy="13" r="7"/><path d="M12 13V9M10 3h4M18 7l1.5-1.5"/>',
+    phone:'<path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
     mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     kb:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.5M11 10h.5M15 10h.5M8 14h8"/>',
     gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
@@ -2841,7 +2857,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
     $('rg-d').onclick=function(){var r=ringing;stopRing();if(r&&r.opt.done)r.opt.done();if(!r||!r.opt.doneLabel){toast('เยี่ยม! ทำเสร็จแล้ว');beep(1175,0,.08);beep(1568,.1,.14)}};
     var v=null;try{v=sessionStorage.getItem('pt-view')}catch(e){}
     if(v!=='tuna')goHome();else{$('home').hidden=true}
-    homeTick();setInterval(appsTick,250);setTimeout(checkDue,1500);setTimeout(function(){wtPoll();wtLoad()},2500);setInterval(wtPoll,7000);initCare();setInterval(careTick,1000);
+    homeTick();setInterval(appsTick,250);setTimeout(checkDue,1500);setTimeout(function(){wtPoll();wtLoad()},2500);setInterval(wtPoll,7000);initCare();setInterval(careTick,1000);initCall();
     var sc=$('screen'),tbT=0;function tbOn(){sc.classList.add('tb');tbT=Date.now()}
     $('tbf').onclick=function(){audio();tbOn()};document.querySelector('.tabs').addEventListener('pointerdown',function(){tbT=Date.now()},true);
     setInterval(function(){if(!sc.classList.contains('tb'))return;var busy=sc.getAttribute('data-tab')||!$('ovl').hidden||!$('pnl').hidden||!$('game').hidden;
@@ -3123,7 +3139,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   }
   function wtTalk(B){
     var hd=E('div','wthd');hd.appendChild(IB('minus','','กลับ',function(){WT.peer=null;WT.queue=[];renderApp();wtLoad()}));hd.lastChild.innerHTML='‹';
-    var av=E('i','wtav',(WT.peer.name||WT.peer.u).slice(0,1).toUpperCase());av.style.background=wtColor(WT.peer.u);hd.appendChild(av);hd.appendChild(E('b',null,WT.peer.name||WT.peer.u));B.appendChild(hd);
+    var av=E('i','wtav',(WT.peer.name||WT.peer.u).slice(0,1).toUpperCase());av.style.background=wtColor(WT.peer.u);hd.appendChild(av);hd.appendChild(E('b',null,WT.peer.name||WT.peer.u));var cb=IB('phone','on','โทร',function(){callStart(WT.peer)});cb.classList.add('wtcall');hd.appendChild(cb);B.appendChild(hd);
     var L=E('div','alist wtl');if(!WT.thread.length)L.appendChild(E('div','aempty sm','ยังไม่มีข้อความ\nกดปุ่มค้างไว้แล้วพูดได้เลย'));
     WT.thread.forEach(function(m){var b=E('button','wtm'+(m.me?' me':'')+(!m.me&&!m.heard?' new':'')+(WT.playing===m.id?' play':''));b.type='button';
       b.appendChild(E('i',null,WT.playing===m.id?'■':'▶'));b.appendChild(E('span',null,(Math.round(m.secs*10)/10||'?')+' วิ'));
@@ -3220,6 +3236,79 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;paddin
   function initCare(){renderCare();
     document.querySelectorAll('.tabs button[data-t]').forEach(function(t){t.addEventListener('click',function(){if(t.dataset.t==='care')setTimeout(renderCare,0)})})}
   function careTick(){if(S&&S.napUntil&&Date.now()>=S.napUntil){S.napUntil=0;if(S.sleeping){S.sleeping=false;S.energy=cl(S.energy+15);toast('ตื่นจากงีบแล้ว สดชื่น!');save();ui();renderCare()}}}
+  /* ===== โทรสด (WebRTC เสียง) ระหว่างรายชื่อในวอ ===== */
+  var CALL={st:'idle',id:'',peer:null,pc:null,ms:null,t0:0,tk:null,ring:null,after:-1,muted:false,timer:null,pend:null};
+  var ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}]};
+  function callUI(){
+    var o=$('call');if(CALL.st==='idle'){o.hidden=true;return}o.hidden=false;
+    var p=CALL.peer||{u:'?',name:'?'};$('cl-av').textContent=(p.name||p.u).slice(0,1).toUpperCase();$('cl-av').style.background=wtColor(p.u);$('cl-n').textContent=p.name||p.u;
+    var s={out:'กำลังโทร…',in:'โทรเข้ามา',conn:'กำลังเชื่อมต่อ…',live:'',end:CALL.why||'วางสายแล้ว'}[CALL.st];$('cl-s').textContent=s;
+    $('cl-in').hidden=CALL.st!=='in';$('cl-live').hidden=CALL.st==='in'||CALL.st==='end';
+    $('cl-mute').classList.toggle('on',CALL.muted);$('cl-mute').lastChild.textContent=CALL.muted?'เปิดไมค์':'ปิดไมค์';
+    o.classList.toggle('live',CALL.st==='live');
+  }
+  function callTick(){if(CALL.st==='live'){var s=Math.floor((Date.now()-CALL.t0)/1000);$('cl-s').textContent=pad(Math.floor(s/60))+':'+pad(s%60)}}
+  function ringLoop(on,incoming){clearInterval(CALL.ring);CALL.ring=null;if(!on)return;var f=function(){if(incoming){beep(784,0,.18);beep(988,.22,.18);beep(784,.44,.18);if(navigator.vibrate)navigator.vibrate([300,150,300])}else{beep(440,0,.4);beep(440,.6,.4)}};f();CALL.ring=setInterval(f,incoming?1600:3000)}
+  function iceDone(pc){return new Promise(function(res){if(pc.iceGatheringState==='complete')return res();var t=setTimeout(res,2500);pc.addEventListener('icegatheringstatechange',function(){if(pc.iceGatheringState==='complete'){clearTimeout(t);res()}})})}
+  function mkPC(){
+    var pc=new RTCPeerConnection(ICE);CALL.pc=pc;
+    pc.ontrack=function(e){var au=$('call-au');au.srcObject=e.streams[0];var p=au.play();if(p&&p.catch)p.catch(function(){})};
+    pc.onconnectionstatechange=function(){var s=pc.connectionState;
+      if(s==='connected'&&CALL.st!=='live'){CALL.st='live';CALL.t0=Date.now();ringLoop(false);clearTimeout(CALL.timer);beep(1175,0,.08);callUI()}
+      else if((s==='failed')&&CALL.st!=='idle')callEnd('ต่อไม่ติด เครือข่ายอาจบล็อก ลองใช้ WiFi เดียวกัน',true)
+      else if(s==='disconnected'&&CALL.st==='live')setTimeout(function(){if(pc.connectionState==='disconnected')callEnd('สายหลุด',true)},4000)};
+    CALL.ms.getTracks().forEach(function(t){pc.addTrack(t,CALL.ms)});return pc;
+  }
+  function getMic(){return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+  function sig(kind,sdp){if(!CALL.peer)return Promise.resolve();return wtCall('tama_call_send',{p_to:CALL.peer.u,p_call:CALL.id,p_kind:kind,p_sdp:sdp||null})}
+  function callStart(peer){
+    if(CALL.st!=='idle')return;if(!window.RTCPeerConnection||!navigator.mediaDevices){toast('เครื่องนี้โทรไม่ได้');return}
+    audio();if(typeof vStopTTS==='function')vStopTTS();
+    CALL.peer={u:peer.u,name:peer.name};CALL.id=uid()+uid();CALL.st='out';CALL.why='';CALL.muted=false;callUI();ringLoop(true,false);
+    getMic().then(function(ms){if(CALL.st!=='out')return ms.getTracks().forEach(function(t){t.stop()});CALL.ms=ms;var pc=mkPC();
+      return pc.createOffer().then(function(o){return pc.setLocalDescription(o)}).then(function(){return iceDone(pc)}).then(function(){if(CALL.st!=='out')return;
+        return sig('offer',pc.localDescription.sdp).then(function(r){if(!r||!r.ok)throw r;CALL.timer=setTimeout(function(){if(CALL.st==='out'){sig('end');callEnd('ไม่มีคนรับสาย')}},40000)})})})
+    .catch(function(e){callEnd(e&&e.err==='not_contact'?'ยังไม่ได้เป็นรายชื่อกัน':e&&e.name==='NotAllowedError'?'ยังไม่ได้อนุญาตไมโครโฟน':'โทรไม่สำเร็จ')});
+  }
+  function callAccept(){
+    if(CALL.st!=='in'||!CALL.pend)return;audio();ringLoop(false);CALL.st='conn';callUI();var off=CALL.pend;
+    getMic().then(function(ms){CALL.ms=ms;var pc=mkPC();
+      return pc.setRemoteDescription({type:'offer',sdp:off}).then(function(){return pc.createAnswer()}).then(function(a){return pc.setLocalDescription(a)}).then(function(){return iceDone(pc)})
+        .then(function(){return sig('answer',pc.localDescription.sdp)}).then(function(){CALL.timer=setTimeout(function(){if(CALL.st==='conn'){sig('end');callEnd('ต่อไม่ติด ลองใหม่อีกครั้ง',true)}},20000)})})
+    .catch(function(e){sig('end');callEnd(e&&e.name==='NotAllowedError'?'ยังไม่ได้อนุญาตไมโครโฟน':'รับสายไม่สำเร็จ')});
+  }
+  function callEnd(why,sendEnd){
+    if(CALL.st==='idle')return;if(sendEnd)sig('end');ringLoop(false);clearTimeout(CALL.timer);
+    try{if(CALL.pc)CALL.pc.close()}catch(e){}CALL.pc=null;if(CALL.ms)CALL.ms.getTracks().forEach(function(t){t.stop()});CALL.ms=null;
+    try{$('call-au').srcObject=null}catch(e){}
+    var wasLive=CALL.st==='live',dur=wasLive?Math.floor((Date.now()-CALL.t0)/1000):0;
+    CALL.st='end';CALL.why=why||(wasLive?'วางสายแล้ว · '+pad(Math.floor(dur/60))+':'+pad(dur%60):'วางสายแล้ว');CALL.pend=null;callUI();beep(523,0,.15);beep(392,.18,.2);
+    setTimeout(function(){if(CALL.st==='end'){CALL.st='idle';CALL.peer=null;callUI()}},2200);
+  }
+  function callPoll(){
+    if(!wtOn())return;
+    wtCall('tama_call_poll',{p_after:CALL.after}).then(function(r){
+      if(!r||!r.ok)return;if(CALL.after<0){CALL.after=r.max||0;return}
+      (r.list||[]).forEach(function(m){CALL.after=Math.max(CALL.after,m.id);
+        if(m.kind==='offer'){if(m.age>35)return;
+          if(CALL.st!=='idle'&&CALL.st!=='end'){wtCall('tama_call_send',{p_to:m.from,p_call:m.call,p_kind:'busy',p_sdp:null});return}
+          CALL.st='in';CALL.peer={u:m.from,name:m.name};CALL.id=m.call;CALL.pend=m.sdp;CALL.why='';CALL.muted=false;if(typeof stopRing==='function'&&ringing)stopRing();callUI();ringLoop(true,true);sysNotify('📞 '+m.name+' โทรมา','แตะเพื่อรับสาย');
+          CALL.timer=setTimeout(function(){if(CALL.st==='in'&&CALL.id===m.call)callEnd('สายที่ไม่ได้รับจาก '+m.name)},40000);return}
+        if(m.call!==CALL.id)return;
+        if(m.kind==='answer'&&CALL.st==='out'&&CALL.pc){CALL.st='conn';ringLoop(false);clearTimeout(CALL.timer);callUI();
+          CALL.pc.setRemoteDescription({type:'answer',sdp:m.sdp}).catch(function(){callEnd('ต่อไม่ติด',true)});CALL.timer=setTimeout(function(){if(CALL.st==='conn')callEnd('ต่อไม่ติด เครือข่ายอาจบล็อก ลองใช้ WiFi เดียวกัน',true)},20000)}
+        else if(m.kind==='decline')callEnd(CALL.peer.name+' ไม่สะดวกรับสาย');
+        else if(m.kind==='busy')callEnd(CALL.peer.name+' ติดสายอยู่');
+        else if(m.kind==='end')callEnd(CALL.st==='in'?'สายที่ไม่ได้รับจาก '+CALL.peer.name:null);
+      });
+    },function(){});
+  }
+  function initCall(){
+    $('cl-ok').onclick=callAccept;$('cl-no').onclick=function(){sig('decline');callEnd('ปฏิเสธสายแล้ว')};
+    $('cl-end').onclick=function(){callEnd(null,true)};
+    $('cl-mute').onclick=function(){CALL.muted=!CALL.muted;if(CALL.ms)CALL.ms.getAudioTracks().forEach(function(t){t.enabled=!CALL.muted});callUI()};
+    setInterval(function(){callPoll();},1500);setInterval(callTick,500);callPoll();
+  }
 
   buildOnb();buildBg();initEcon();if(!S.name)showOnb();initApps();
   decay();ui();
